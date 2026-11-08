@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>심해의 노래 1.5</title>
+<title>심해의 노래 1.8</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -122,8 +122,19 @@ canvas#c { display: block; transition: transform .45s cubic-bezier(.6,0,.3,1); }
 .result div { display: grid; gap: 2px; }
 .result span { font-size: 12px; color: var(--ink); letter-spacing: .06em; }
 .result strong { font-family: var(--display); font-weight: 400; font-size: 32px; }
+.result strong small { font-size: 16px; color: var(--ink); }
 .err { color: var(--warn) !important; }
-@media (prefers-reduced-motion: reduce) { canvas#c { transition: none; } }
+.dda { margin-top: 8px; padding: 6px 10px 7px; border-radius: 12px; background: rgba(5,11,31,.5); width: fit-content; display: grid; gap: 4px; font-size: 11.5px; color: var(--ink); font-variant-numeric: tabular-nums; transition: box-shadow .3s; }
+.dda.pulse { box-shadow: 0 0 0 2px rgba(232,247,255,.6); }
+.ddalv { font-family: var(--display); font-size: 14px; color: var(--foam); }
+.ddarow { display: grid; grid-template-columns: auto 34px auto; column-gap: 6px; align-items: center; }
+.ddarow b { font-weight: 600; text-align: right; color: var(--foam); }
+.ddarow em { font-style: normal; }
+.ddarow.up em { color: #b4ffd2; } .ddarow.down em { color: #ffc4dc; }
+.ddarow i { grid-column: 1 / -1; height: 3px; border-radius: 2px; background: rgba(232,247,255,.15); overflow: hidden; }
+.ddarow i u { display: block; height: 100%; width: 0; text-decoration: none; transition: width .15s; }
+.ddarow.up i u { background: #8cffbe; } .ddarow.down i u { background: #ff9fc8; }
+@media (prefers-reduced-motion: reduce) { canvas#c { transition: none; } .dda, .ddarow i u { transition: none; } }
 </style>
 </head>
 <body>
@@ -139,6 +150,11 @@ canvas#c { display: block; transition: transform .45s cubic-bezier(.6,0,.3,1); }
           <div class="sub" id="sub">박자 정확도 -</div>
           <div class="zone" id="zone">얕은 바다</div>
           <div class="gimmick" id="gimmick" hidden></div>
+          <div class="dda" id="dda" hidden>
+            <div class="ddalv" id="ddaLv">물살 레벨</div>
+            <div class="ddarow up"><span>Good 이상 연속</span><b id="ddaUpN">0/10</b><em>→ 난이도 ↑</em><i><u id="ddaUpBar"></u></i></div>
+            <div class="ddarow down"><span>Bad 이하 연속</span><b id="ddaDownN">0/3</b><em>→ 난이도 ↓</em><i><u id="ddaDownBar"></u></i></div>
+          </div>
         </div>
       </div>
       <button class="iconbtn" id="pauseBtn" aria-label="일시정지"><svg viewBox="0 0 24 24"><rect x="6" y="4" width="4" height="16" rx="1"/><rect x="14" y="4" width="4" height="16" rx="1"/></svg></button>
@@ -148,7 +164,7 @@ canvas#c { display: block; transition: transform .45s cubic-bezier(.6,0,.3,1); }
 
     <!-- 처음 화면 -->
     <div class="overlay" id="home">
-      <div class="tag" id="verTag">PROTOTYPE 1.5 · 음악 모드</div>
+      <div class="tag" id="verTag">PROTOTYPE 1.8 · 음악 모드</div>
       <h1>플래피 젤리피쉬<br>심해의 노래</h1>
       <p>노래를 넣으면 박자마다 플랑크톤을 놓고, 플랑크톤 사이를 물결 길로 이어요. 플랑크톤 높이는 소리 크기에, 헤엄 속도는 노래 빠르기에 맞춰져요.</p>
       <button class="btn" id="pickBtn">내 음악 불러오기</button>
@@ -199,12 +215,12 @@ canvas#c { display: block; transition: transform .45s cubic-bezier(.6,0,.3,1); }
       <p class="err" id="readyNote" hidden></p>
       <div class="label">난이도 · 기둥 통로가 보장하는 오차</div>
       <div class="chips" id="physChips"></div>
-      <p class="tip">빛나는 플랑크톤이 해파리에 닿는 순간 누르세요(스페이스·↑·W·F·D·J·K·탭). 제때 누르면 다음 플랑크톤으로 뛰어오르고, 놓치면 가라앉아요. 아무 때나 누르면 살짝 튀어 올라요(Bad). 연타하면 화면 위로 사라질 수 있어요. 소리가 1/4박으로 몰아치는 곳과 느린 구간(100 BPM 미만, 어려움은 50 BPM 미만)의 평평한 곳은 하늘색 띠(길게 누르기): 첫 플랑크톤에서 누르고 띠 끝 고리에서 떼세요. 노래가 빨라지거나 느려지면 해류가 헤엄 속도를 바꿔요. 빨라지는 구간의 기둥에는 돛새치, 느려지는 구간의 기둥에는 거북이가 그려져 있어요.</p>
+      <p class="tip">빛나는 플랑크톤이 해파리에 닿는 순간 누르세요(스페이스·↑·W·F·D·J·K·탭). 제때 누르면 다음 플랑크톤으로 뛰어오르고, 놓치면 가라앉아요. 근처에 플랑크톤이 없을 때 누르면 살짝 튀어 오르고 Miss가 돼요(헛누름, 콤보가 끊겨요). 연타하면 화면 위로 사라질 수 있어요. 소리가 1/4박으로 몰아치는 곳과 느린 구간(100 BPM 미만, 어려움은 50 BPM 미만)의 평평한 곳은 하늘색 띠(길게 누르기): 첫 플랑크톤에서 누르고 띠 끝 고리에서 떼세요. 노래가 빨라지거나 느려지면 해류가 헤엄 속도를 바꿔요. 빨라지는 구간의 기둥에는 돛새치, 느려지는 구간의 기둥에는 거북이가 그려져 있어요.</p>
       <p class="tip">보통·어려움에서는 킥(쿵)이면 위로 솟구치고, 스네어(탁)면 아래로 파고들었다가 올라와요. 방향이 바뀌는 첫 플랑크톤에만 <b style="color:#ff9ad8;font-weight:400">분홍 ↑</b>(여기부터 위로), <b style="color:#8fd0ff;font-weight:400">파랑 ↓</b>(여기부터 아래로) 표시가 붙어요. 쉬움은 전부 위로만 솟아요.</p>
       <p class="tip">회색 <b style="font-weight:400;color:#dfe6f2">쉼표</b>에서는 손을 멈추고 미끄러져 내려가요. 주황 <b style="font-weight:400;color:#ffbf73">몰아치기</b>는 반 박마다 톡톡 눌러요(보통 최대 4번, 어려움 최대 8번, 쉬움 없음). 빨라지거나 느려지기 4박 전부터 남은 박을 세 줘요.</p>
       <button class="btn" id="startBtn">시작하기</button>
       <button class="btn ghost" id="endlessBtn">이 곡으로 무한 모드</button>
-      <p class="tip">무한 모드: 곡이 끝나지 않고 계속 반복돼요. 퍼펙트를 연달아 잘 누르면 곡이 점점 빨라지고 길게 누르기 띠가 줄어들어요. Bad·Miss가 잦으면 곡이 느려지고 기둥 사이가 넓어져요. 기둥 통로 높이도 잘하면 96px까지 좁아지고, 못하면 150px까지 넓어져요.</p>
+      <p class="tip">무한 모드: 곡이 끝나지 않고 계속 반복돼요. Good 이상을 10번 연속 받으면 물살 레벨(난이도)이 1 오르고, Bad·Miss를 3번 연속 받으면 1 내려가요(헛누름도 Miss예요). 화면 왼쪽 위에 남은 횟수가 보여요. 레벨이 오르면 곡이 빨라지고 길게 누르기 띠가 줄어들고, 내려가면 곡이 느려지고 기둥 사이가 넓어져요. 기둥 통로 높이도 잘하면 96px까지 좁아지고, 못하면 150px까지 넓어져요.</p>
       <div class="row2"><button class="btn ghost" id="otherBtn">다른 곡 고르기</button><button class="btn ghost" id="syncBtn">싱크 맞추기</button></div>
     </div>
 
@@ -255,14 +271,14 @@ canvas#c { display: block; transition: transform .45s cubic-bezier(.6,0,.3,1); }
 // ===================================================================
 const ENGINE = (() => {
   // 버전 하나로 화면 표기·저장 키·캐시 무효화를 모두 맞춘다
-  const VERSION = '1.5';
+  const VERSION = '1.8';
   // ---------- 화면 상수 ----------
   const W = 420, H = 720, JX = W * 0.3, HIT_R = 14, PIPE_W = 72, DT = 1 / 60;
   const SEABED = H - 22;                 // 해저 그림 위치 (충돌 없음: 화면 밖으로 나가야 실패)
   const START_Y = H * 0.5;
   const Y_TOP = 240, Y_BOT = H - 160;    // 플랑크톤이 놓이는 높이 범위 (소리 크기 0~1을 여기에 맞춘다). 위쪽은 점수 표시와 겹치지 않게
   const FALL_G = 1000;                   // 놓쳤을 때 떨어지는 가속도 (px/s²). 한 번 놓쳐도 다음 박자에 살릴 여지가 있게
-  const PERFECT = 0.05, GOOD = 0.11;     // 점수 판정 (초)
+  const PERFECT = 0.05, GOOD = 0.11;     // 점수 판정 기본값 (초). 1.7부터 난이도 표의 perfect·good을 쓴다 (Good 폭 = 기둥 통과 보장 오차 tol)
   const PRESS_WIN = 0.2;                 // 이 안에 누르면 그 플랑크톤을 누른 것으로 친다
   const BUMP_H = 34, BUMP_T = 0.32;
   const RELATCH_R = 40, RELATCH_PULL = 0.1;   // 쉬움: 띠에서 이 거리(px) 안에서 누르면 다시 붙음, 붙을 때 끌려가는 시간(초)   // 헛누름 한 번에 튀는 높이(px)와 시간
@@ -272,12 +288,14 @@ const ENGINE = (() => {
   // 난이도 = 기둥 통로가 보장하는 허용 오차. 이 오차 안에서 누르면 반드시 기둥을 지나간다
   const DIFF = {
     // bursts: 몰아치기 최대 횟수, gap: 몰아치기 사이 최소 박 수, burstI·burstSub: 몰아치기 고르는 기준(낮을수록 많이), burstSnare: 몰아치기 안에도 스네어 섞기
-    easy: { name: '쉬움', tol: 0.15, minGap: 150, relatch: 3, bursts: 0 },   // relatch: 길게 누르기 띠 하나에서 떨어져도 띠 근처에서 다시 누르면 붙는 횟수     // minGap: 길게 누르기 중처럼 길이 곧아도 통로가 이보다 좁지 않게
-    normal: { name: '보통', tol: 0.10, minGap: 120, relatch: 2, drums: true, bursts: 4, gap: 24, burstI: 0.6, burstSub: 0.2 },   // drums: 킥은 위로, 스네어는 아래로 (보통 이상)
-    hard: { name: '어려움', tol: 0.06, minGap: 96, drums: true, slowBpm: 50, holdFlat: 30, bursts: 8, gap: 12, burstI: 0.45, burstSub: 0.12, burstSnare: true },   // slowBpm·holdFlat: 느린 구간 직선(길게 누르기)의 템포·높이 차이 기준. 없으면 SLOW_BPM·HOLD_FLAT
+    easy: { name: '쉬움', tol: 0.15, perfect: 0.06, good: 0.15, minGap: 150, relatch: 3, bursts: 0, holdMax: 7 },   // holdMax: 길게 누르기 띠 하나의 최대 플랑크톤 수. 1.6: 쉬움 7 / 보통 5 / 어려움 3   // relatch: 길게 누르기 띠 하나에서 떨어져도 띠 근처에서 다시 누르면 붙는 횟수     // minGap: 길게 누르기 중처럼 길이 곧아도 통로가 이보다 좁지 않게
+    normal: { name: '보통', tol: 0.10, perfect: 0.05, good: 0.10, minGap: 120, relatch: 2, holdMax: 5, drums: true, bursts: 4, gap: 24, burstI: 0.6, burstSub: 0.2 },   // drums: 킥은 위로, 스네어는 아래로 (보통 이상)
+    hard: { name: '어려움', tol: 0.06, perfect: 0.035, good: 0.06, minGap: 96, holdMax: 3, drums: true, slowBpm: 50, holdFlat: 30, bursts: 8, gap: 12, burstI: 0.45, burstSub: 0.12, burstSnare: true },   // slowBpm·holdFlat: 느린 구간 직선(길게 누르기)의 템포·높이 차이 기준. 없으면 SLOW_BPM·HOLD_FLAT
   };
 
   const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+  // 띠(시작 플랑크톤) 하나의 다시 붙기 횟수. 무한 모드 띠는 만들 때 정한 값을 갖고, 아니면 난이도 표 값
+  const relOf = (stage, st) => (st && st.relatch !== undefined ? st.relatch : ((DIFF[stage.diff] || {}).relatch || 0));
   const lerp = (a, b, t) => a + (b - a) * t;
   const median = (arr) => { const s = [...arr].sort((a, b) => a - b); return s.length ? s[s.length >> 1] : 0; };
   const tick = () => new Promise((r) => setTimeout(r, 0));
@@ -601,7 +619,7 @@ const ENGINE = (() => {
       const nx = stage.notes[a.j + 1];
       run.arc = nx ? makeArc(t, y, nx.time, nx.y, n.drum === 's' ? -1 : 1) : { t0: t, y0: y, t1: stage.duration + 30, y1: y, h: 0 };
       // 쉬움: 길게 누르기 시작을 놓치면 천천히 가라앉아서 띠 근처에서 다시 붙을 틈이 있게
-      if (nx && nx.kind === 'start' && (DIFF[stage.diff] || {}).relatch) run.arc.soft = true;
+      if (nx && nx.kind === 'start' && relOf(stage, nx)) run.arc.soft = true;
       if (nx && n.glide) run.arc.h = 0;                         // 쉼표 앞: 손을 멈추고 미끄러지듯 내려간다
       run.holding = false;
     }
@@ -632,14 +650,15 @@ const ENGINE = (() => {
       if (run.holding) return null;
       const y = arcY(run.arc, t);
       // 쉬움·보통: 길게 누르기 띠가 진행 중이고(끝 떼기가 남음) 띠에서 RELATCH_R 안이면 다시 붙는다 (띠마다 relatch번까지)
-      if (DIFF[stage.diff] && DIFF[stage.diff].relatch && a && a.type === 'release' && t < a.time - 0.05) {
+      const relMax = a && a.type === 'release' ? relOf(stage, stage.notes[stage.notes[a.j].holdStart]) : 0;
+      if (relMax && t < a.time - 0.05) {
         const e = stage.notes[a.j], st = stage.notes[e.holdStart];
-        if (t > st.time && (run.relatchJ !== a.j || run.relatchN < DIFF[stage.diff].relatch)) {
+        if (t > st.time && (run.relatchJ !== a.j || run.relatchN < relMax)) {
           const line = st.y + (e.y - st.y) * (t - st.time) / (e.time - st.time);
           if (Math.abs(y - line) <= RELATCH_R) {
             run.arc = { t0: t, y0: y, t1: e.time, y1: e.y, h: 0, lt: st.time, ly: st.y, off: y - line };
             run.relatchN = run.relatchJ === a.j ? run.relatchN + 1 : 1; run.holding = true; run.relatchJ = a.j;
-            return { relatch: true, j: a.j, n: run.relatchN, max: DIFF[stage.diff].relatch };
+            return { relatch: true, j: a.j, n: run.relatchN, max: relMax };
           }
         }
       }
@@ -743,7 +762,7 @@ const ENGINE = (() => {
       // i번 플랑크톤에서 다음 박자까지가 촘촘하면, 촘촘함이 끝나는 박자(최대 HOLD_MAX박)까지 하나의 직선
       if (!free(notes[i]) || !dense(notes[i]) || notes[i + 1].beat !== notes[i].beat + 1 || !free(notes[i + 1])) { i++; continue; }
       let j = i + 1;
-      while (j < notes.length - 1 && j - i < HOLD_MAX && dense(notes[j]) && notes[j + 1].beat === notes[j].beat + 1 && free(notes[j + 1])) j++;
+      while (j < notes.length - 1 && j - i + 1 < (diff.holdMax ?? HOLD_MAX) && dense(notes[j]) && notes[j + 1].beat === notes[j].beat + 1 && free(notes[j + 1])) j++;
       makeHold(i, j);
       i = j + 1;
     }
@@ -753,7 +772,7 @@ const ENGINE = (() => {
         let j = i, lo = notes[i].y, hi = notes[i].y;
         const slow = (nt) => an.bpm * (tempo[nt.beat] || 1) < (diff.slowBpm ?? SLOW_BPM);
         if (!slow(notes[i])) { i++; continue; }
-        while (j + 1 < notes.length && notes[j + 1].kind === 'tap' && !notes[j + 1].burst && !notes[j].glide && notes[j + 1].beat === notes[j].beat + 1 && j + 1 - i < HOLD_MAX && slow(notes[j + 1])) {
+        while (j + 1 < notes.length && notes[j + 1].kind === 'tap' && !notes[j + 1].burst && !notes[j].glide && notes[j + 1].beat === notes[j].beat + 1 && j + 1 - i < (diff.holdMax ?? HOLD_MAX) && slow(notes[j + 1])) {
           const y = notes[j + 1].y, nlo = Math.min(lo, y), nhi = Math.max(hi, y);
           if (nhi - nlo > (diff.holdFlat ?? HOLD_FLAT)) break;
           lo = nlo; hi = nhi; j++;
@@ -865,9 +884,9 @@ const ENGINE = (() => {
     const minGap = p.minGap ?? (DIFF[stage.diff] || DIFF.normal).minGap;   // 무한 모드는 기둥마다 동적 난이도가 정한 값
     if (p.bottom - p.top < minGap) { const c = (p.top + p.bottom) / 2; p.top = c - minGap / 2; p.bottom = c + minGap / 2; }
     // 쉬움: 길게 누르기 띠 위(시작~끝 사이)에 선 기둥은 떨어졌다 다시 붙는 길도 지나가게 띠 위 40px·아래 70px까지 넓힌다
-    if ((DIFF[stage.diff] || {}).relatch) {
+    {
       const s0 = notes.find((nt) => nt.kind === 'start' && nt.time < p.time && notes[nt.holdEnd].time >= p.time);
-      if (s0) {
+      if (s0 && relOf(stage, s0)) {
         const e0 = notes[s0.holdEnd], line = s0.y + (e0.y - s0.y) * (p.time - s0.time) / (e0.time - s0.time);
         p.top = Math.min(p.top, line - RELATCH_R - HIT_R - 6); p.bottom = Math.max(p.bottom, line + 70 + HIT_R + 6); p.relatchWide = true;
       }
@@ -938,6 +957,11 @@ const ENGINE = (() => {
   }
   function extendStage(stage, an, i0, prof) {
     const diff = DIFF[stage.diff] || DIFF.normal;
+    // 1.7: 띠 최대 길이는 물살 레벨 6에서 고른 난이도 값, 한 레벨마다 ∓1 (2~9). 2보다 더 줄어들 만큼은 묶음당 몰아치기를 그만큼 더 낸다
+    const rawMax = (diff.holdMax || HOLD_MAX) - ((prof.level ?? 6) - 6);
+    const holdMax = clamp(rawMax, 2, 9), extraBursts = Math.max(0, 2 - rawMax);
+    const holdRel = holdMax >= 6 ? 3 : holdMax >= 4 ? 2 : 0;   // 다시 붙기: 띠 최대 6 이상 = 쉬움(3번), 4 이상 = 보통(2번), 그 밖 = 없음
+    stage.holdMax = holdMax; stage.holdRel = holdRel; stage.extraBursts = extraBursts;
     const { beats, loud, intensity, tempo } = an;
     const i1 = beats.length, sub = an.sub || [], srcT = an.srcTempo || tempo;
     const track = makeTrack(an);
@@ -957,12 +981,12 @@ const ENGINE = (() => {
     }
     // 몰아치기: 레벨이 높을수록 많이 (prof.bursts = 이 묶음 최대 횟수). 쉼표: 소리 없는 박자
     const restB = an.rest || [], burstBeat = new Set();
-    for (let i = i0 + 4, n = 0; i < i1 - 6 && n < (prof.bursts || 0); i++) {
+    for (let i = i0 + 4, n = 0; i < i1 - 6 && n < (prof.bursts || 0) + extraBursts; i++) {
       if (((i - an.downPhase) % 4 + 4) % 4 !== 0 || beats[i + 4] - beats[i] < 1.6) continue;
-      if (![0, 1, 2, 3, 4].every((q) => !restB[i + q]) || ![0, 1, 2, 3].every((q) => (intensity[i + q] ?? 0) > 0.45 && ((sub[i + q] || [])[1] || 0) >= 0.12)) continue;
+      if (![0, 1, 2, 3, 4].every((q) => !restB[i + q]) || ![0, 1, 2, 3].every((q) => (intensity[i + q] ?? 0) > 0.45 - 0.05 * extraBursts && ((sub[i + q] || [])[1] || 0) >= 0.12 - 0.02 * extraBursts)) continue;   // 몰아치기를 더 낼 때는 기준도 조금 낮춘다
       for (let q = 0; q < 4; q++) burstBeat.add(i + q);
       stage.bursts.push({ time: beats[i], end: beats[i + 4], warn: (beats[i + 4] - beats[i]) / 2 });
-      n++; i += 11;
+      n++; i += extraBursts ? Math.max(5, 11 - 2 * extraBursts) : 11;
     }
     for (let i = Math.max(i0, 1); i < i1; i++) if (restB[i]) { let j = i; while (j + 1 < i1 && restB[j + 1]) j++; stage.rests.push({ time: beats[i], end: beats[Math.min(i1 - 1, j + 1)], warn: 2.2 }); i = j; }
     // 플랑크톤
@@ -993,7 +1017,7 @@ const ENGINE = (() => {
     const dense = (nt) => { const s3 = sub[nt.beat]; if (!s3) return false; return s3[0] >= SUB_TH || s3[2] >= SUB_TH || (HOLD_RULE === 'eighth' && s3[1] >= SUB_TH); };
     const makeHold = (i, j) => {
       const a = notes[i], b = notes[j];
-      a.kind = 'start'; a.holdStart = i; a.holdEnd = j; b.kind = 'end'; b.holdStart = i;
+      a.kind = 'start'; a.holdStart = i; a.holdEnd = j; b.kind = 'end'; b.holdStart = i; a.relatch = holdRel;
       for (let k = i + 1; k < j; k++) { notes[k].kind = 'mid'; notes[k].holdStart = i; notes[k].y = lerp(a.y, b.y, (notes[k].time - a.time) / (b.time - a.time)); }
       stage.holds++;
     };
@@ -1001,7 +1025,7 @@ const ENGINE = (() => {
     for (let i = firstNew; i < n1 - 1;) {
       if (!free(notes[i]) || !dense(notes[i]) || notes[i + 1].beat !== notes[i].beat + 1 || !free(notes[i + 1])) { i++; continue; }
       let j = i + 1;
-      while (j < n1 - 1 && j - i < HOLD_MAX && dense(notes[j]) && notes[j + 1].beat === notes[j].beat + 1 && free(notes[j + 1])) j++;
+      while (j < n1 - 1 && j - i + 1 < holdMax && dense(notes[j]) && notes[j + 1].beat === notes[j].beat + 1 && free(notes[j + 1])) j++;
       if (keep()) makeHold(i, j);
       i = j + 1;
     }
@@ -1010,7 +1034,7 @@ const ENGINE = (() => {
       for (let i = firstNew; i < n1;) {
         if (notes[i].kind !== 'tap' || notes[i].burst || notes[i].glide || !slow(notes[i])) { i++; continue; }
         let j = i, lo = notes[i].y, hi = notes[i].y;
-        while (j + 1 < n1 && notes[j + 1].kind === 'tap' && !notes[j + 1].burst && !notes[j].glide && notes[j + 1].beat === notes[j].beat + 1 && j + 1 - i < HOLD_MAX && slow(notes[j + 1])) {
+        while (j + 1 < n1 && notes[j + 1].kind === 'tap' && !notes[j + 1].burst && !notes[j].glide && notes[j + 1].beat === notes[j].beat + 1 && j + 1 - i < holdMax && slow(notes[j + 1])) {
           const y = notes[j + 1].y, nlo = Math.min(lo, y), nhi = Math.max(hi, y);
           if (nhi - nlo > (diff.holdFlat ?? HOLD_FLAT)) break;
           lo = nlo; hi = nhi; j++;
@@ -1108,7 +1132,7 @@ const ENGINE = (() => {
     return { analysis: an };
   }
 
-  return { VERSION, W, H, JX, HIT_R, PIPE_W, DT, SEABED, START_Y, PERFECT, GOOD, DIFF, fft, analyze, makeTrack, generate, validate, zoneAt,
+  return { VERSION, relOf, W, H, JX, HIT_R, PIPE_W, DT, SEABED, START_Y, PERFECT, GOOD, DIFF, fft, analyze, makeTrack, generate, validate, zoneAt,
     newEndless, extendStage, makeArc, arcY, newRun, act, posY, collide, pillarX, playRun, job, clamp, lerp };
 })();
 if (typeof module !== 'undefined') module.exports = ENGINE;
@@ -1276,13 +1300,36 @@ if (typeof WorkerGlobalScope !== 'undefined' && typeof self !== 'undefined' && s
     let rate = Math.round((DDA.rateMin + (DDA.rateMax - DDA.rateMin) * L) / DDA.rateStep) * DDA.rateStep;
     if (prevRate) rate = clamp(rate, prevRate - DDA.rateStep, prevRate + DDA.rateStep);   // 한 묶음에 5%씩만 바뀐다
     rate = +clamp(rate, DDA.rateMin, DDA.rateMax).toFixed(2);
-    const holdKeep = L <= 0.5 ? 1 : lerp(1, DDA.holdMin, (L - 0.5) / 0.5);
+    const holdKeep = 1;   // 1.7: 띠를 확률로 지우지 않는다. 대신 레벨마다 띠 최대 길이가 ±1 (엔진 extendStage)
     const pillarSec = L >= 0.5 ? DDA.gapNear : lerp(DDA.gapFar, DDA.gapNear, L / 0.5);
     const minGap = Math.round(lerp(DDA.minGapWide, DDA.minGapNarrow, L));
     const bursts = L < 0.25 ? 0 : L < 0.6 ? 1 : 2, burstSnare = L > 0.7;   // 잘할수록 몰아치기가 늘고, 아주 잘하면 몰아치기 안에 스네어도 섞인다(보통 이상)
-    return { rate, prevRate: prevRate || rate, holdKeep, pillarSec, minGap, bursts, burstSnare };
+    return { rate, prevRate: prevRate || rate, holdKeep, pillarSec, minGap, bursts, burstSnare, level: levelOf(L) };
   }
   const levelOf = (L) => 1 + Math.round(L * 9);
+  // 1.6: 무한 모드 난이도는 연속 판정으로 바뀐다. Good 이상 STREAK_UP번 연속 → 물살 레벨 +1, Bad 이하(Bad·Miss, 헛누름도 Miss) STREAK_DOWN번 연속 → −1
+  //  바뀐 레벨은 다음에 만드는 묶음(32박)부터 적용된다
+  const STREAK_UP = 10, STREAK_DOWN = 3, LSTEP = 1 / 9;
+  function ddaHit(good) {
+    const en = endless; if (!en || state !== 'playing') return;
+    if (good) { en.down = 0; en.up++; } else { en.up = 0; en.down++; }
+    let txt = null;
+    if (en.up >= STREAK_UP) { en.up = 0; if (en.L < 1 - 1e-6) { en.L = clamp(en.L + LSTEP, 0, 1); txt = `난이도 ↑ 물살 레벨 ${levelOf(en.L)}`; } }
+    if (en.down >= STREAK_DOWN) { en.down = 0; if (en.L > 1e-6) { en.L = clamp(en.L - LSTEP, 0, 1); txt = `난이도 ↓ 물살 레벨 ${levelOf(en.L)}`; } }
+    if (levelOf(en.L) >= 10) en.L = 1; else if (levelOf(en.L) <= 1) en.L = 0;   // 끝 레벨에서는 끝값으로 맞춘다 (보이지 않는 한 칸이 남지 않게)
+    en.maxL = Math.max(en.maxL, en.L);
+    if (txt) { en.flash = performance.now(); popups.push({ x: JX + 26, y: fishY - 70, t: 0, text: txt + ' · 다음 물살부터', small: true, col: txt.includes('↑') ? '#b4ffd2' : '#ffc4dc' }); }
+    drawDda();
+  }
+  function drawDda() {
+    const box = $('dda'), en = endless;
+    if (!en) { box.hidden = true; return; }
+    box.hidden = false;
+    $('ddaUpN').textContent = `${en.up}/${STREAK_UP}`; $('ddaDownN').textContent = `${en.down}/${STREAK_DOWN}`;
+    $('ddaUpBar').style.width = `${en.up / STREAK_UP * 100}%`; $('ddaDownBar').style.width = `${en.down / STREAK_DOWN * 100}%`;
+    $('ddaLv').textContent = `물살 레벨 ${levelOf(en.L)}${en.L >= 1 - 1e-6 ? ' (최고)' : en.L <= 1e-6 ? ' (최저)' : ''}`;
+    box.classList.toggle('pulse', en.flash !== undefined && performance.now() - en.flash < 900);
+  }
   let endless = null, liveSources = [], audioQueue = [], perfStreak = 0, normalSaved = null;   // normalSaved: 무한 모드에 들어가기 전 일반 맵
   function playChunk(c) {
     const a = audio(), g = a.createGain(), src = a.createBufferSource(), at = songStart + c.at, X = 0.01;
@@ -1314,7 +1361,7 @@ if (typeof WorkerGlobalScope !== 'undefined' && typeof self !== 'undefined' && s
       setStep('validate', 0.5, '이음매 확인 중');
       await new Promise((r) => setTimeout(r, 0));
       stage = E.newEndless(src.an, diffKey, prof); report = { ok: true };
-      endless = { src, L, maxL: L, rate: prof.rate, maxRate: prof.rate, snap: { p: 0, g: 0, o: 0, m: 0, s: 0 }, streak: 0, busy: false, msg: '', msgSub: '', msgAt: undefined };
+      endless = { src, L, maxL: L, chunkL: L, rate: prof.rate, maxRate: prof.rate, up: 0, down: 0, flash: undefined, busy: false, msg: '', msgSub: '', msgAt: undefined };
       startPlay();
     } catch (e) { console.warn(e); if (loadId === myLoad) { if (normalSaved) ({ stage, report } = normalSaved); failLoad('endless'); } }
   }
@@ -1322,18 +1369,8 @@ if (typeof WorkerGlobalScope !== 'undefined' && typeof self !== 'undefined' && s
   async function extendEndless() {
     const en = endless; if (!en || en.busy) return;
     en.busy = true;
-    const now = { p: perfects, g: goods, o: oks, m: misses, s: strays }, d = {};
-    for (const k in now) d[k] = now[k] - en.snap[k];
-    en.snap = now;
-    const judged = d.p + d.g + d.o + d.m + d.s, bad = d.o + d.m + d.s, streak = en.streak; en.streak = perfStreak;
-    const before = en.L;
-    if (judged >= 6) {
-      if (streak >= 8 && bad <= 1) en.L += 0.12;                        // 퍼펙트를 8번 넘게 연달아
-      else if (d.p / judged >= 0.7 && bad <= 1) en.L += 0.06;            // 대부분 퍼펙트
-      else if (bad >= 4 || bad / judged > 0.25) en.L -= 0.15;           // Bad·Miss가 잦음
-      else if (bad >= 2) en.L -= 0.06;
-      en.L = clamp(en.L, 0, 1); en.maxL = Math.max(en.maxL, en.L);
-    }
+    const before = en.chunkL;   // 지난 묶음을 만들 때의 레벨 (레벨은 플레이 중 연속 판정으로 바뀐다)
+    en.chunkL = en.L;
     try {
       const prof = profOf(en.L, en.rate);
       const i0 = await en.src.next(prof.rate, queueAudio);
@@ -1343,7 +1380,7 @@ if (typeof WorkerGlobalScope !== 'undefined' && typeof self !== 'undefined' && s
       if (prof.rate !== en.rate || levelOf(en.L) !== levelOf(before)) {
         const up = en.L > before || prof.rate > en.rate;
         en.msg = `물살 레벨 ${levelOf(en.L)} ${up ? '↑' : '↓'} · 빠르기 ×${prof.rate.toFixed(2)}`;
-        en.msgSub = up ? '잘하고 있어요 · 곡이 빨라지고 띠와 통로가 줄어요' : '조금 쉬어 가요 · 곡이 느려지고 기둥 사이와 통로가 넓어져요';
+        en.msgSub = up ? `Good 이상 ${STREAK_UP}번 연속 · 곡이 빨라지고 띠와 통로가 줄어요` : `Bad 이하 ${STREAK_DOWN}번 연속 · 곡이 느려지고 기둥 사이와 통로가 넓어져요`;
         en.msgAt = t0;
       }
       en.rate = prof.rate; en.maxRate = Math.max(en.maxRate, en.rate);
@@ -1752,6 +1789,7 @@ if (typeof WorkerGlobalScope !== 'undefined' && typeof self !== 'undefined' && s
     songStart = a.currentTime + 3;          // 3초 카운트다운 뒤 시작
     perfStreak = 0;
     state = 'playing'; show(null);
+    drawDda();
     if (endless) { const q = audioQueue; audioQueue = []; for (const c of q) playChunk(c); }
     else { source = a.createBufferSource(); source.buffer = song.buffer; source.connect(gainNode); source.start(songStart); }
     $('score').innerHTML = `0<small> 점</small>`;
@@ -1802,20 +1840,24 @@ if (typeof WorkerGlobalScope !== 'undefined' && typeof self !== 'undefined' && s
     if (r && (r.early || r.stray)) perfStreak = 0;
     if (r && r.early) {
       misses++;
-      const easyRe = E.DIFF[diffKey].relatch, en = stage.notes[r.j];
+      const en = stage.notes[r.j], easyRe = en ? E.relOf(stage, stage.notes[en.holdStart]) : 0;
       if (en) stage.notes[en.holdStart].broken = true;
       if (!easyRe) { const ra = stage.actions.find((a) => a.j === r.j && a.type === 'release'); if (ra) ra.done = true; breakHold(r.j); }
       if (combo >= 3) popups.push({ x: px, y: py + 18, t: 0, text: '콤보 끊김', small: true, col: '#c7d3e6' });
       combo = 0;
       popups.push({ x: px, y: py, t: 0, text: 'Miss · 일찍 뗌', col: '#ff9a9a' });
+      ddaHit(false);
       return;
     }
     if (!r && q.type === 'release') return;        // 짧게 누른 뒤 손 떼기는 그냥 무시
     if (!r) return;                                 // 길게 누르는 중 다른 손가락 등: 무시
     if (r.stray) {
-      // Bad(헛누름): 콤보는 유지, 점수 없음. 해파리가 살짝 튀어 오른다
-      strays++;
-      popups.push({ x: px, y: py, t: 0, text: 'Bad', small: true, col: '#b9a8ff' });
+      // 헛누름: 근처에 플랑크톤이 없을 때 누름. 1.8부터 Miss로 세고 콤보가 끊긴다. 점수 없음. 해파리가 살짝 튀어 오른다
+      strays++; misses++; perfStreak = 0;
+      if (combo >= 3) popups.push({ x: px, y: py + 18, t: 0, text: '콤보 끊김', small: true, col: '#c7d3e6' });
+      combo = 0;
+      popups.push({ x: px, y: py, t: 0, text: 'Miss · 헛누름', small: true, col: '#ff9a9a' });
+      ddaHit(false);
       for (let i = 0; i < 3; i++) bubbles.push({ x: JX + rand(-10, 10), y: fishY + 12, r: rand(1, 2.5), vy: rand(20, 50), life: rand(0.4, 0.8) });
       return;
     }
@@ -1824,10 +1866,12 @@ if (typeof WorkerGlobalScope !== 'undefined' && typeof self !== 'undefined' && s
     n.hit = true; lastPressT = t;
     if (n.kind === 'start') popups.push({ x: px, y: py - 22, t: 0, text: '길게 누르기', small: true, col: '#9eeaff' });
     for (let i = 0; i < 6; i++) bubbles.push({ x: JX + rand(-14, 14), y: fishY + 10, r: rand(1.5, 3.5), vy: rand(20, 70), life: rand(0.7, 1.2) });
-    if (ad <= E.GOOD) {
-      const perfect = ad <= E.PERFECT;
+    const jw = E.DIFF[diffKey] || E.DIFF.normal;
+    if (ad <= (jw.good ?? E.GOOD)) {
+      const perfect = ad <= (jw.perfect ?? E.PERFECT);
       combo++; bestCombo = Math.max(bestCombo, combo);
-      if (perfect) { perfects++; perfStreak++; if (endless) endless.streak = Math.max(endless.streak, perfStreak); } else { goods++; perfStreak = 0; }
+      if (perfect) { perfects++; perfStreak++; } else { goods++; perfStreak = 0; }
+      ddaHit(true);
       const bonus = (perfect ? 10 : 5) * (1 + Math.min(combo, 10));
       points += bonus;
       popups.push({ x: px, y: py, t: 0, text: `${perfect ? 'Perfect' : 'Good'} +${bonus}`, big: perfect, col: perfect ? '#ffe58a' : '#bfefff' });
@@ -1836,7 +1880,8 @@ if (typeof WorkerGlobalScope !== 'undefined' && typeof self !== 'undefined' && s
       oks++; perfStreak = 0;
       if (combo >= 3) popups.push({ x: px, y: py + 18, t: 0, text: '콤보 끊김', small: true, col: '#c7d3e6' });
       combo = 0;
-      popups.push({ x: px, y: py, t: 0, text: r.d < 0 ? 'Miss · 빠름' : 'Miss · 느림', col: '#ff9a9a' });
+      popups.push({ x: px, y: py, t: 0, text: r.d < 0 ? 'Bad · 빠름' : 'Bad · 느림', col: '#ffb27a' });
+      ddaHit(false);
     }
   }
 
@@ -1852,12 +1897,12 @@ if (typeof WorkerGlobalScope !== 'undefined' && typeof self !== 'undefined' && s
       const en = endless, key = `fjm-endless:${song.id || song.name}:${diffKey}`;
       let best = 0; try { best = parseInt(localStorage.getItem(key) || '0', 10) || 0; } catch (e) {}
       if (points > best) { best = points; try { localStorage.setItem(key, String(best)); } catch (e) {} }
-      const judged = perfects + goods + oks + misses;
+      const judged = perfects + goods + oks + misses - strays;   // 박자 정확도는 플랑크톤 판정만 (헛누름 제외)
       $('resTag').textContent = `무한 모드 · ${song.name}`;
       $('resTitle').textContent = `${fmtTime(Math.max(0, simT))} 동안 헤엄쳤어요`;
       $('rScore').textContent = points; $('rProg').textContent = String(score);
       $('rAcc').textContent = judged ? Math.round((100 * (perfects + goods)) / judged) + '%' : '-';
-      $('rBest').textContent = `${en.src.lapOf(simT)}바퀴째 · 최고 물살 레벨 ${levelOf(en.maxL)} · 최고 빠르기 ×${en.maxRate.toFixed(2)} · Perfect ${perfects} · Good ${goods} · Miss ${oks + misses} · Bad ${strays} · 최고 콤보 ${bestCombo} · 이 곡 무한 모드(${E.DIFF[diffKey].name}) 최고 ${best}점`;
+      $('rBest').textContent = `${en.src.lapOf(simT)}바퀴째 · 최고 물살 레벨 ${levelOf(en.maxL)} · 최고 빠르기 ×${en.maxRate.toFixed(2)} · Perfect ${perfects} · Good ${goods} · Bad ${oks} · Miss ${misses} · 최고 콤보 ${bestCombo} · 이 곡 무한 모드(${E.DIFF[diffKey].name}) 최고 ${best}점`;
       $('retryBtn').focus({ preventScroll: true });
       return;
     }
@@ -1865,14 +1910,14 @@ if (typeof WorkerGlobalScope !== 'undefined' && typeof self !== 'undefined' && s
     if (cleared) points += 500;
     $('resTitle').textContent = cleared ? '노래 끝까지 헤엄쳤어요!' : deathCause === 'bottom' ? '박자를 놓쳐 아래로 가라앉았어요' : deathCause === 'top' ? '화면 위로 사라졌어요' : '기둥에 부딪혔어요';
     const prog = clamp(simT / stage.duration, 0, 1);
-    const judged = perfects + goods + oks + misses;
+    const judged = perfects + goods + oks + misses - strays;   // 박자 정확도는 플랑크톤 판정만 (헛누름 제외)
     $('rScore').textContent = points;
-    $('rProg').textContent = `${score}/${stage.pillars.length}`;
+    $('rProg').innerHTML = `${score}/${stage.pillars.length}<small> (${Math.round((cleared ? 1 : prog) * 100)}%)</small>`;
     $('rAcc').textContent = judged ? Math.round((100 * (perfects + goods)) / judged) + '%' : '-';
     const key = bestKey(song.id || song.name, diffKey);
     let best = bestOf(song.id || song.name, diffKey);
     if (points > best) { best = points; try { localStorage.setItem(key, String(best)); } catch (e) {} }
-    $('rBest').textContent = `Perfect ${perfects} · Good ${goods} · Miss ${oks + misses} · Bad ${strays} · 최고 콤보 ${bestCombo} · 곡 진행 ${Math.round((cleared ? 1 : prog) * 100)}%${cleared ? ' · 완주 +500' : ''} · ${E.DIFF[diffKey].name} 최고 ${best}점`;
+    $('rBest').textContent = `Perfect ${perfects} · Good ${goods} · Bad ${oks} · Miss ${misses} · 최고 콤보 ${bestCombo}${cleared ? ' · 완주 +500' : ''} · ${E.DIFF[diffKey].name} 최고 ${best}점`;
     $('retryBtn').focus({ preventScroll: true });
   }
 
@@ -1938,10 +1983,11 @@ if (typeof WorkerGlobalScope !== 'undefined' && typeof self !== 'undefined' && s
           // 쉬움: 이미 Miss로 센 띠(시작 놓침·일찍 뗌)를 다시 붙지 않고 끝까지 갔으면 끝 떼기는 조용히 넘긴다
           if (a.type === 'release' && notes[n.holdStart].broken && !run.holding) continue;
           misses++; perfStreak = 0;
-          if (n.kind === 'start') { n.broken = true; if (!E.DIFF[diffKey].relatch) breakHold(n.holdEnd); }
+          if (n.kind === 'start') { n.broken = true; if (!E.relOf(stage, n)) breakHold(n.holdEnd); }
           if (combo >= 3) popups.push({ x: JX + 26, y: fishY - 16, t: 0, text: '콤보 끊김', small: true, col: '#c7d3e6' });
           combo = 0;
           popups.push({ x: JX + 26, y: fishY - 34, t: 0, text: a.type === 'release' ? 'Miss · 못 뗌' : 'Miss', col: '#ff9a9a' });
+          ddaHit(false);
         }
         // 길게 누르는 동안 지나가는 가운데 플랑크톤: 하나마다 +5점
         while (midIdx < notes.length && notes[midIdx].time <= simT) {
@@ -1968,6 +2014,7 @@ if (typeof WorkerGlobalScope !== 'undefined' && typeof self !== 'undefined' && s
       const z = E.zoneAt(stage, g);
       darkness = lerp(darkness, z.I, 1 - Math.exp(-1.5 * dt));
       frame.classList.toggle('drop', z.I > 0.66);
+      if (endless && endless.flash !== undefined) drawDda();
       $('zone').textContent = `${z.name} · 속도 ${(stage.track.speed(simT) / stage.baseSpeed).toFixed(2)}x`;
       $('progBar').style.width = (endless ? endless.L * 100 : clamp(g / stage.duration, 0, 1) * 100).toFixed(1) + '%';
       $('score').innerHTML = `${points}<small> 점</small>`;
@@ -2147,7 +2194,7 @@ if (typeof WorkerGlobalScope !== 'undefined' && typeof self !== 'undefined' && s
       const e = notes[s.holdEnd];
       if (e.time < simT - 0.2) continue;
       if (JX + (s.d - D0) > W + 20) break;
-      const broken = e.missed || (s.missed && !E.DIFF[diffKey].relatch), live = run && run.holding && simT >= s.time && simT <= e.time && !broken;
+      const broken = e.missed || (s.missed && !E.relOf(stage, s)), live = run && run.holding && simT >= s.time && simT <= e.time && !broken;
       ctx.beginPath(); let first = true;
       for (let k = s.holdStart; k <= s.holdEnd; k++) {
         const m = notes[k]; let x = JX + (m.d - D0), y = m.y;
@@ -2203,14 +2250,10 @@ if (typeof WorkerGlobalScope !== 'undefined' && typeof self !== 'undefined' && s
     }
   }
   function drawFloor() {
-    const d = darkness;
-    ctx.fillStyle = mix('#3a5a63', '#141c2a', d); ctx.fillRect(0, SEABED, W, H - SEABED);
-    ctx.fillStyle = mix('#c9b88a', '#4a4a50', d);
-    ctx.beginPath(); ctx.moveTo(0, SEABED);
-    for (let x = 0; x <= W; x += 10) ctx.lineTo(x, SEABED + 4 + Math.sin((x + worldX) * 0.05) * 3);
-    ctx.lineTo(W, SEABED + 14); ctx.lineTo(0, SEABED + 14); ctx.closePath(); ctx.fill();
-    ctx.fillStyle = mix('#2c444b', '#0d131e', d);
-    for (const r of rocks) { const x = ((r.x - worldX) % 560 + 560) % 560 - 20; ctx.beginPath(); ctx.ellipse(x, SEABED + 6, r.r, r.r * 0.6, 0, Math.PI, 0); ctx.fill(); }
+    // 1.7: 해저 그림 대신 화면 아래쪽을 살짝 어둡게 (이 아래로 빠지면 가라앉아 실패)
+    const g = ctx.createLinearGradient(0, H - 110, 0, H);
+    g.addColorStop(0, 'rgba(2,6,18,0)'); g.addColorStop(1, `rgba(2,6,18,${0.45 + 0.2 * darkness})`);
+    ctx.fillStyle = g; ctx.fillRect(0, H - 110, W, 110);
   }
 
   let last = performance.now();
