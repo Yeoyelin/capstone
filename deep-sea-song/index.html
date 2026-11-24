@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>심해의 노래 1.8</title>
+<title>심해의 노래 2.3</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -74,22 +74,18 @@ canvas#c { display: block; transition: transform .45s cubic-bezier(.6,0,.3,1); }
 .songname { font-family: var(--display); font-size: 26px; max-width: 100%; overflow-wrap: anywhere; }
 #ready { gap: 9px; }
 #ready .btn.ghost { font-size: 16px; padding: 7px 16px; min-width: 0; }
+/* 2.3: 콤보 표시. 깊이 구역 바로 밑 고정 자리 (콤보 2 미만이면 자리만 비워 둬서 해류 칩이 움직이지 않음) */
+.combo { min-height: 22px; margin-top: 6px; font-family: var(--display); font-size: 18px; line-height: 22px; color: #ffe58a; text-shadow: 0 2px 0 rgba(0,0,0,.35); font-variant-numeric: tabular-nums; transform-origin: left center; }
+.combo.hot { color: #fff1b8; text-shadow: 0 0 8px rgba(255,229,138,.7), 0 2px 0 rgba(0,0,0,.35); }
+.combo.pop { animation: comboPop .18s ease-out; }
+@keyframes comboPop { from { transform: scale(1.25); } to { transform: scale(1); } }
+@media (prefers-reduced-motion: reduce) { .combo.pop { animation: none; } }
 .gimmick { display: block; width: fit-content; margin-top: 6px; font-family: var(--display); font-size: 15px; padding: 2px 10px; border-radius: 999px; }
 .gimmick.current { background: rgba(127,227,255,.22); color: #c9f4ff; }
 .gimmick.surge { background: rgba(140,255,190,.2); color: #d4ffe6; }
 .gimmick.surge.slow { background: rgba(255,159,200,.22); color: #ffe0ee; }
-.banner.surge.slow b { color: #ffc4dc; }
-.banner.surge b { color: #b4ffd2; }
 .gimmick.flip { background: rgba(255,154,77,.3); color: #ffe0c7; }
-.banner { position: absolute; left: 50%; top: 30%; transform: translateX(-50%); display: grid; gap: 2px; text-align: center; pointer-events: none; padding: 10px 18px; border-radius: 16px; background: rgba(5,11,31,.55); white-space: nowrap; animation: blink .5s ease-in-out infinite alternate; }
-.banner b { font-family: var(--display); font-weight: 400; font-size: 30px; }
-.banner span { font-size: 13px; color: var(--ink); }
-.banner.flip b { color: #ffb27a; }
-.banner.current b { color: #9eeaff; }
-.banner.rest b { color: #dfe6f2; }
-.banner.burst b { color: #ffbf73; }
 @keyframes blink { from { opacity: 1; } to { opacity: .55; } }
-@media (prefers-reduced-motion: reduce) { .banner { animation: none; } }
 .songs { width: 100%; max-width: 330px; display: grid; gap: 6px; }
 .songitems { display: grid; gap: 6px; max-height: 168px; overflow-y: auto; }
 .songrow { display: flex; gap: 6px; }
@@ -101,11 +97,59 @@ canvas#c { display: block; transition: transform .45s cubic-bezier(.6,0,.3,1); }
 .songbtn span { font-size: 12px; color: var(--ink); }
 .songdel { width: 38px; border-radius: 12px; border: 1px solid rgba(232,247,255,.18); background: transparent; color: var(--ink); font-size: 20px; cursor: pointer; }
 .saved { display: inline-block; font-size: 11.5px; padding: 1px 8px; border-radius: 999px; background: rgba(255,211,107,.2); color: #ffd36b; margin-right: 4px; }
+/* 2.1: 게임 중 기믹 예고는 오른쪽 위 작은 표지(아이콘 + 이름 + 남은 박). 해파리(왼쪽 가운데)와 겹치지 않는다 */
+.cue { position: absolute; right: 14px; top: 66px; display: flex; align-items: center; gap: 7px; padding: 5px 11px 5px 6px; border-radius: 999px; background: rgba(5,11,31,.72); border: 1px solid var(--cue-line); color: var(--cue-ink); font-family: var(--display); font-size: 14px; pointer-events: none; white-space: nowrap; max-width: calc(100% - 28px); --cue: #ffbf73; --cue-ink: #ffd9a8; --cue-line: rgba(255,191,115,.55); }
+.cue i { width: 24px; height: 24px; flex: none; border-radius: 50%; background: color-mix(in srgb, var(--cue) 22%, transparent); display: grid; place-items: center; }
+.cue i svg { width: 16px; height: 16px; }
+.cue span { overflow: hidden; text-overflow: ellipsis; }
+.cue b { font-weight: 400; font-size: 20px; color: var(--cue); font-variant-numeric: tabular-nums; }
+.cue small { font-size: 11px; color: var(--ink); font-family: var(--body); }
+.cue.now b { font-size: 14px; }
+.cue.pop { animation: cuepop .35s ease-out; }
+@keyframes cuepop { from { transform: scale(.85); opacity: 0; } to { transform: none; opacity: 1; } }
+.cue.rest { --cue: #dfe6f2; --cue-ink: #eef2f8; --cue-line: rgba(223,230,242,.45); }
+.cue.burst { --cue: #ffbf73; --cue-ink: #ffd9a8; --cue-line: rgba(255,191,115,.55); }
+.cue.fast { --cue: #b4ffd2; --cue-ink: #d4ffe6; --cue-line: rgba(140,255,190,.5); }
+.cue.slow { --cue: #ffc4dc; --cue-ink: #ffe0ee; --cue-line: rgba(255,159,200,.5); }
+.cue.current { --cue: #9eeaff; --cue-ink: #c9f4ff; --cue-line: rgba(127,227,255,.5); }
+@media (prefers-reduced-motion: reduce) { .cue.pop { animation: none; } }
+
+/* 2.1: 시작 화면 기믹 안내 버튼 + 안내 카드 */
+.tutbtn { position: relative; font-family: var(--display); font-size: 17px; padding: 8px 18px; border-radius: 999px; border: none; cursor: pointer; background: rgba(5,11,31,.45); color: var(--foam); box-shadow: inset 0 0 0 1.5px rgba(232,247,255,.5); display: inline-flex; gap: 8px; align-items: center; }
+.tutbtn:hover { background: rgba(232,247,255,.1); }
+.tutbtn:focus-visible { outline: 3px solid var(--glow); outline-offset: 2px; }
+.tutbtn small { font-family: var(--body); font-size: 12px; color: var(--ink); }
+.tutbtn .new { position: absolute; top: -6px; right: -4px; font-family: var(--body); font-size: 10px; font-weight: 700; padding: 1px 6px; border-radius: 999px; background: var(--warn); color: #2a1a00; }
+.tutsub { font-size: 12px !important; margin-top: -6px !important; opacity: .85; }
+#tut { gap: 10px; }
+#tut .tcard { width: 100%; max-width: 340px; border-radius: 18px; background: rgba(5,11,31,.6); border: 1px solid rgba(232,247,255,.18); padding: 14px 16px 12px; display: grid; gap: 9px; text-align: left; }
+#tut .tcard h2 { font-size: 28px; text-align: center; }
+#tut .art { border-radius: 12px; background: linear-gradient(#0f3a5c, #081a35); overflow: hidden; }
+#tut .art svg { display: block; width: 100%; height: auto; }
+#tut ul { margin: 0; padding-left: 18px; color: var(--foam); font-size: 13.5px; line-height: 1.55; word-break: keep-all; display: grid; gap: 2px; }
+#tut ul li::marker { color: var(--tc, var(--glow)); }
+#tut ul em { font-style: normal; color: var(--tc, var(--glow)); }
+#tut .where { display: flex; gap: 6px; justify-content: center; flex-wrap: wrap; }
+#tut .where span { font-size: 12px; padding: 3px 10px; border-radius: 999px; background: rgba(232,247,255,.08); color: rgba(159,195,216,.6); text-decoration: line-through; }
+#tut .where span.on { background: color-mix(in srgb, var(--tc, var(--glow)) 25%, transparent); color: var(--foam); text-decoration: none; }
+#tut .dots { display: flex; gap: 6px; justify-content: center; }
+#tut .dots button { width: 8px; height: 8px; padding: 0; border: none; border-radius: 50%; background: rgba(232,247,255,.25); cursor: pointer; }
+#tut .dots button[aria-current="true"] { background: var(--glow); width: 20px; border-radius: 4px; }
+#tut .row2 .btn { font-size: 18px; padding: 9px 20px; min-width: 0; }
+#tut .linkbtn { background: none; border: none; color: var(--ink); font: inherit; font-size: 12.5px; text-decoration: underline; cursor: pointer; opacity: .85; }
+.cuechip { display: inline-grid; vertical-align: -5px; width: 20px; height: 20px; border-radius: 50%; place-items: center; background: rgba(232,247,255,.14); }
+.cuechip svg { width: 13px; height: 13px; }
 #home h1 { word-break: keep-all; font-size: clamp(34px, 10.5vw, 46px); }
 .row2 { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; }
 .btn.small { font-size: 15px; padding: 6px 14px; min-width: 0; }
 #ready .row2 .btn.ghost { font-size: 15px; padding: 7px 14px; }
 .syncdots { font-size: 18px; letter-spacing: 3px; color: var(--glow); min-height: 24px; }
+/* 2.3: 싱크 측정 카운트다운 (딸깍과 같이 3 · 2 · 1 → 누르세요) */
+.synccount { font-family: Jua, sans-serif; font-size: 44px; line-height: 1.1; min-height: 50px; color: var(--glow); }
+.synccount.go { font-size: 26px; color: #ffe58a; }
+.synccount.pop { animation: syncPop .25s ease-out; }
+@keyframes syncPop { from { transform: scale(1.35); opacity: .6; } to { transform: scale(1); opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .synccount.pop { animation: none; } }
 .tip { font-size: 12.5px; color: var(--ink); max-width: 330px; line-height: 1.5; margin: 0; text-wrap: pretty; }
 .facts { display: flex; gap: 11px; justify-content: center; font-variant-numeric: tabular-nums; }
 .facts div { display: grid; gap: 1px; }
@@ -118,12 +162,24 @@ canvas#c { display: block; transition: transform .45s cubic-bezier(.6,0,.3,1); }
 .verdict { font-size: 14px !important; color: var(--foam) !important; }
 .verdict b { color: var(--kelp); font-weight: 400; }
 .verdict.bad b { color: var(--warn); }
-.result { display: flex; gap: 20px; justify-content: center; font-variant-numeric: tabular-nums; }
+.result { display: flex; gap: 16px; justify-content: center; font-variant-numeric: tabular-nums; }
 .result div { display: grid; gap: 2px; }
 .result span { font-size: 12px; color: var(--ink); letter-spacing: .06em; }
-.result strong { font-family: var(--display); font-weight: 400; font-size: 32px; }
+.result strong { font-family: var(--display); font-weight: 400; font-size: clamp(24px, 7.6vw, 32px); white-space: nowrap; }
 .result strong small { font-size: 16px; color: var(--ink); }
 .err { color: var(--warn) !important; }
+.gradebar { width: min(320px, 86vw); display: grid; gap: 4px; }
+.gradebar .gtrack { position: relative; height: 14px; border-radius: 999px; background: rgba(232,247,255,.14); overflow: hidden; }
+.gradebar .gfill { position: absolute; inset: 0 auto 0 0; width: 0; border-radius: 999px; background: linear-gradient(90deg, var(--kelp), #9eeaff); transition: width .9s cubic-bezier(.2,.8,.2,1); }
+.gradebar .gfill.top { background: linear-gradient(90deg, #ffd36b, #ffe58a, var(--glow)); }
+.gradebar .gtick { position: absolute; top: 0; bottom: 0; width: 1px; background: rgba(5,11,31,.55); }
+.gradebar .glabels { position: relative; height: 14px; font-size: 10.5px; color: var(--ink); }
+.gradebar .glabels span { position: absolute; padding-left: 2px; border-left: 1px solid rgba(232,247,255,.35); line-height: 14px; }   /* 등급이 시작되는 눈금 바로 아래에 적는다 */
+.gradebar .gpct { font-size: 12.5px; color: var(--foam); font-variant-numeric: tabular-nums; text-align: right; }
+.grade { display: flex; gap: 10px; align-items: baseline; justify-content: center; flex-wrap: wrap; }
+.grade b { font-family: var(--display); font-weight: 400; font-size: 52px; line-height: 1; text-shadow: 0 3px 0 rgba(0,0,0,.35); }
+.grade b.ap { font-size: 38px; color: #ffe58a; text-shadow: 0 0 18px rgba(255,229,138,.6); }
+.grade em { font-style: normal; font-family: var(--display); font-size: 16px; padding: 2px 10px; border-radius: 999px; background: rgba(255,179,230,.22); color: var(--glow); }
 .dda { margin-top: 8px; padding: 6px 10px 7px; border-radius: 12px; background: rgba(5,11,31,.5); width: fit-content; display: grid; gap: 4px; font-size: 11.5px; color: var(--ink); font-variant-numeric: tabular-nums; transition: box-shadow .3s; }
 .dda.pulse { box-shadow: 0 0 0 2px rgba(232,247,255,.6); }
 .ddalv { font-family: var(--display); font-size: 14px; color: var(--foam); }
@@ -149,6 +205,7 @@ canvas#c { display: block; transition: transform .45s cubic-bezier(.6,0,.3,1); }
           <div class="score" id="score">0<small> / 0</small></div>
           <div class="sub" id="sub">박자 정확도 -</div>
           <div class="zone" id="zone">얕은 바다</div>
+          <div class="combo" id="combo" aria-live="off"></div>
           <div class="gimmick" id="gimmick" hidden></div>
           <div class="dda" id="dda" hidden>
             <div class="ddalv" id="ddaLv">물살 레벨</div>
@@ -160,16 +217,18 @@ canvas#c { display: block; transition: transform .45s cubic-bezier(.6,0,.3,1); }
       <button class="iconbtn" id="pauseBtn" aria-label="일시정지"><svg viewBox="0 0 24 24"><rect x="6" y="4" width="4" height="16" rx="1"/><rect x="14" y="4" width="4" height="16" rx="1"/></svg></button>
     </div>
     <div class="count" id="count" hidden></div>
-    <div class="banner" id="banner" hidden><b></b><span></span></div>
+    <div class="cue" id="cue" hidden aria-live="polite"><i></i><span></span><b></b><small></small></div>
 
     <!-- 처음 화면 -->
     <div class="overlay" id="home">
-      <div class="tag" id="verTag">PROTOTYPE 1.8 · 음악 모드</div>
+      <div class="tag" id="verTag">PROTOTYPE 2.3 · 음악 모드</div>
       <h1>플래피 젤리피쉬<br>심해의 노래</h1>
-      <p>노래를 넣으면 박자마다 플랑크톤을 놓고, 플랑크톤 사이를 물결 길로 이어요. 플랑크톤 높이는 소리 크기에, 헤엄 속도는 노래 빠르기에 맞춰져요.</p>
+      <button class="tutbtn" id="tutBtn"><svg width="18" height="18" viewBox="0 0 16 16" aria-hidden="true"><circle cx="4" cy="11" r="2.3" fill="none" stroke="#ffbf73" stroke-width="1.6"/><circle cx="8.5" cy="7.5" r="2.3" fill="none" stroke="#ffbf73" stroke-width="1.6"/><circle cx="13" cy="4" r="2.3" fill="none" stroke="#ffbf73" stroke-width="1.6"/></svg>기믹 안내 보기 <small>12가지</small><span class="new" id="tutNew" hidden>NEW</span></button>
+      <p class="tutsub">처음이라면 1분만 보고 시작해요</p>
       <button class="btn" id="pickBtn">내 음악 불러오기</button>
       <input type="file" id="file" accept="audio/*" hidden>
       <p class="drop-hint">음악 파일을 이 화면에 끌어다 놓아도 돼요 (mp3, wav, ogg, m4a)</p>
+      <label class="drop-hint" style="display:block;cursor:pointer"><input type="checkbox" id="directChk"> 바로 무한 모드로 시작 (분석이 끝나기 전에 시작해요)</label>
       <div class="songs" id="demoList">
         <div class="label">데모 곡 · 파일 없이 바로 해 볼 수 있어요</div>
         <div class="songitems demoitems" id="demoItems"></div>
@@ -180,6 +239,20 @@ canvas#c { display: block; transition: transform .45s cubic-bezier(.6,0,.3,1); }
       </div>
       <p class="privacy">음악은 이 기기 안에서만 분석·재생되고 어디에도 올라가지 않아요.</p>
       <p class="err" id="homeErr" hidden></p>
+    </div>
+
+    <!-- 2.1: 기믹 안내 -->
+    <div class="overlay" id="tut" hidden>
+      <div class="tag" id="tutTag">기믹 안내 · 1 / 12</div>
+      <div class="tcard" id="tutCard">
+        <h2 id="tutTitle"></h2>
+        <div class="art" id="tutArt"></div>
+        <ul id="tutList"></ul>
+        <div class="where" id="tutWhere"></div>
+      </div>
+      <div class="dots" id="tutDots"></div>
+      <div class="row2"><button class="btn ghost" id="tutPrev">이전</button><button class="btn" id="tutNext">다음</button></div>
+      <button class="linkbtn" id="tutClose">닫고 시작 화면으로</button>
     </div>
 
     <!-- 분석 중 -->
@@ -215,24 +288,21 @@ canvas#c { display: block; transition: transform .45s cubic-bezier(.6,0,.3,1); }
       <p class="err" id="readyNote" hidden></p>
       <div class="label">난이도 · 기둥 통로가 보장하는 오차</div>
       <div class="chips" id="physChips"></div>
-      <p class="tip">빛나는 플랑크톤이 해파리에 닿는 순간 누르세요(스페이스·↑·W·F·D·J·K·탭). 제때 누르면 다음 플랑크톤으로 뛰어오르고, 놓치면 가라앉아요. 근처에 플랑크톤이 없을 때 누르면 살짝 튀어 오르고 Miss가 돼요(헛누름, 콤보가 끊겨요). 연타하면 화면 위로 사라질 수 있어요. 소리가 1/4박으로 몰아치는 곳과 느린 구간(100 BPM 미만, 어려움은 50 BPM 미만)의 평평한 곳은 하늘색 띠(길게 누르기): 첫 플랑크톤에서 누르고 띠 끝 고리에서 떼세요. 노래가 빨라지거나 느려지면 해류가 헤엄 속도를 바꿔요. 빨라지는 구간의 기둥에는 돛새치, 느려지는 구간의 기둥에는 거북이가 그려져 있어요.</p>
-      <p class="tip">보통·어려움에서는 킥(쿵)이면 위로 솟구치고, 스네어(탁)면 아래로 파고들었다가 올라와요. 방향이 바뀌는 첫 플랑크톤에만 <b style="color:#ff9ad8;font-weight:400">분홍 ↑</b>(여기부터 위로), <b style="color:#8fd0ff;font-weight:400">파랑 ↓</b>(여기부터 아래로) 표시가 붙어요. 쉬움은 전부 위로만 솟아요.</p>
-      <p class="tip">회색 <b style="font-weight:400;color:#dfe6f2">쉼표</b>에서는 손을 멈추고 미끄러져 내려가요. 주황 <b style="font-weight:400;color:#ffbf73">몰아치기</b>는 반 박마다 톡톡 눌러요(보통 최대 4번, 어려움 최대 8번, 쉬움 없음). 빨라지거나 느려지기 4박 전부터 남은 박을 세 줘요.</p>
+      <div class="row2"><button class="btn ghost" id="otherBtn">다른 곡 고르기</button><button class="btn ghost" id="syncBtn">싱크 맞추기</button></div>
       <button class="btn" id="startBtn">시작하기</button>
       <button class="btn ghost" id="endlessBtn">이 곡으로 무한 모드</button>
-      <p class="tip">무한 모드: 곡이 끝나지 않고 계속 반복돼요. Good 이상을 10번 연속 받으면 물살 레벨(난이도)이 1 오르고, Bad·Miss를 3번 연속 받으면 1 내려가요(헛누름도 Miss예요). 화면 왼쪽 위에 남은 횟수가 보여요. 레벨이 오르면 곡이 빨라지고 길게 누르기 띠가 줄어들고, 내려가면 곡이 느려지고 기둥 사이가 넓어져요. 기둥 통로 높이도 잘하면 96px까지 좁아지고, 못하면 150px까지 넓어져요.</p>
-      <div class="row2"><button class="btn ghost" id="otherBtn">다른 곡 고르기</button><button class="btn ghost" id="syncBtn">싱크 맞추기</button></div>
     </div>
 
     <!-- 싱크 맞추기 -->
     <div class="overlay" id="sync" hidden>
       <h2>싱크 맞추기</h2>
-      <p>소리가 늦게 들리면(특히 블루투스 이어폰) 박자가 어긋나 보여요. 딸깍 소리 16번에 맞춰 누르면 지연을 재서 맞춰 줘요.</p>
+      <p>소리가 늦게 들리면(특히 블루투스 이어폰) 박자가 어긋나 보여요. 딸깍 소리와 함께 3 · 2 · 1을 센 다음, 딸깍 8번에 맞춰 누르면 지연을 재서 맞춰 줘요.</p>
+      <div class="synccount" id="syncCount" aria-live="assertive"></div>
       <div class="syncdots" id="syncDots" aria-live="polite"></div>
       <p id="syncMsg"></p>
       <button class="btn" id="syncStart">측정 시작</button>
       <p class="tip" id="syncNow"></p>
-      <div class="row2"><button class="btn ghost small" id="syncMinus">−10ms</button><button class="btn ghost small" id="syncPlus">+10ms</button><button class="btn ghost small" id="syncReset">자동</button></div>
+      <div class="row2"><button class="btn ghost small" id="syncMinus">−10ms</button><button class="btn ghost small" id="syncMinus1">−1ms</button><button class="btn ghost small" id="syncPlus1">+1ms</button><button class="btn ghost small" id="syncPlus">+10ms</button><button class="btn ghost small" id="syncReset">자동</button></div>
       <p class="tip">플레이해 보고 '빠름'이 많이 뜨면 −, '느림'이 많이 뜨면 + 쪽으로 조금씩 옮겨 보세요.</p>
       <button class="btn ghost" id="syncDone">완료</button>
     </div>
@@ -249,9 +319,15 @@ canvas#c { display: block; transition: transform .45s cubic-bezier(.6,0,.3,1); }
     <div class="overlay" id="result" hidden>
       <div class="tag" id="resTag">-</div>
       <h2 id="resTitle">-</h2>
+      <div class="gradebar" id="rBar">
+        <div class="gtrack"><div class="gfill" id="rBarFill"></div><i class="gtick" style="left:50%"></i><i class="gtick" style="left:70%"></i><i class="gtick" style="left:85%"></i><i class="gtick" style="left:93%"></i><i class="gtick" style="left:97%"></i></div>
+        <div class="glabels"><span style="left:0%">F</span><span style="left:50%">C</span><span style="left:70%">B</span><span style="left:85%">A</span><span style="left:93%">S</span><span style="left:97%">S+</span></div>
+        <div class="gpct" id="rPct">-</div>
+      </div>
+      <div class="grade" id="rGradeRow"><b id="rGrade">-</b><em id="rFC" hidden>Full Combo</em></div>
       <div class="result">
         <div><span>점수</span><strong id="rScore">0</strong></div>
-        <div><span>통과 기둥</span><strong id="rProg">0</strong></div>
+        <div><span id="rProgLabel">통과 기둥(진행률)</span><strong id="rProg">0</strong></div>
         <div><span>박자 정확도</span><strong id="rAcc">-</strong></div>
       </div>
       <p id="rBest"></p>
@@ -271,7 +347,7 @@ canvas#c { display: block; transition: transform .45s cubic-bezier(.6,0,.3,1); }
 // ===================================================================
 const ENGINE = (() => {
   // 버전 하나로 화면 표기·저장 키·캐시 무효화를 모두 맞춘다
-  const VERSION = '1.8';
+  const VERSION = '2.3';
   // ---------- 화면 상수 ----------
   const W = 420, H = 720, JX = W * 0.3, HIT_R = 14, PIPE_W = 72, DT = 1 / 60;
   const SEABED = H - 22;                 // 해저 그림 위치 (충돌 없음: 화면 밖으로 나가야 실패)
@@ -281,8 +357,12 @@ const ENGINE = (() => {
   const PERFECT = 0.05, GOOD = 0.11;     // 점수 판정 기본값 (초). 1.7부터 난이도 표의 perfect·good을 쓴다 (Good 폭 = 기둥 통과 보장 오차 tol)
   const PRESS_WIN = 0.2;                 // 이 안에 누르면 그 플랑크톤을 누른 것으로 친다
   const BUMP_H = 34, BUMP_T = 0.32;
+  // 2.3 막 누르기 벌칙: Good 이상으로 맞히기 전까지 이어진 헛누름마다 튀는 높이가 줄어든다 (1·2·3번째 34·20·10px, 4번째부터 0)
+  // 높이가 0인 헛누름은 움직임에 손대지 않는다 → 떨어지던 해파리는 계속 떨어진다 (빠르게 눌러 제자리에 떠 있는 것도 막음)
+  const STRAY_H = [34, 20, 10];
   const RELATCH_R = 40, RELATCH_PULL = 0.1;   // 쉬움: 띠에서 이 거리(px) 안에서 누르면 다시 붙음, 붙을 때 끌려가는 시간(초)   // 헛누름 한 번에 튀는 높이(px)와 시간
   const HOLD_FLAT = 44, HOLD_MIN = 4, HOLD_MAX = 8;
+  const NOTE_GAP = 0.2;                  // 1.9: 노트 선택에서 노트 사이 최소 간격(초)
   // 직선(길게 누르기) 규칙: 'sixteenth' = 박자 사이 1/4박 지점에 소리가 있는 곳만 / 'eighth' = 반 박 지점까지 / 'both' = 1/4박 + 높이 비슷한 곳
   const HOLD_RULE = 'both', SUB_TH = 0.15, SLOW_BPM = 100;   // 'both'의 높이 기준 직선은 그 구간 템포가 SLOW_BPM 미만일 때만   // 길게 누르기: 높이 차이 44px 안, 플랑크톤 4~8개
   // 난이도 = 기둥 통로가 보장하는 허용 오차. 이 오차 안에서 누르면 반드시 기둥을 지나간다
@@ -324,30 +404,37 @@ const ENGINE = (() => {
   }
 
   // ---------- 1) 음악 분석 ----------
-  async function analyze(samples, sr, onProgress = () => {}) {
+  // 1.9: 분석을 두 단계로 나눴다. (1) 프레임 특징(FFT) 계산은 앞에서부터 이어서 할 수 있고,
+  // (2) 템포·박자·박자별 특징은 그때까지 계산한 프레임으로 구한다 → 점진적 분석(고정 지연 역추적)에 쓴다
+  function newFrameState(samples, sr) {
     const factor = Math.max(1, Math.round(sr / 11025));
     const fs = sr / factor;
     const n = Math.floor(samples.length / factor);
-    const x = new Float32Array(n);
-    for (let i = 0; i < n; i++) { let s = 0; for (let k = 0; k < factor; k++) s += samples[i * factor + k]; x[i] = s / factor; }
-
-    const N = 1024, HOP = 256, frameRate = fs / HOP;
-    const frames = Math.max(0, Math.floor((n - N) / HOP));
+    const N = 1024, HOP = 256;
+    const total = Math.max(0, Math.floor((n - N) / HOP));
     const win = new Float32Array(N);
     for (let i = 0; i < N; i++) win[i] = 0.5 - 0.5 * Math.cos(2 * Math.PI * i / (N - 1));
-    const bins = N / 2;
-    const lowBin = Math.round(150 / (fs / N));
-    // 스네어 대역(1.5~5kHz): 스네어·클랩의 '탁' 하는 잡음이 여기서 크게 시작한다
-    const snLo = Math.round(1500 / (fs / N)), snHi = Math.min(N / 2 - 1, Math.round(5000 / (fs / N)));
-    const snFlux = new Float32Array(frames);
-    const lowFlux = new Float32Array(frames), flux = new Float32Array(frames), rms = new Float32Array(frames), cent = new Float32Array(frames), low = new Float32Array(frames);
-    let prev = new Float32Array(bins);
-    const re = new Float32Array(N), im = new Float32Array(N);
-    for (let f = 0; f < frames; f++) {
+    return {
+      samples, sr, factor, fs, n, N, HOP, total, win, done: 0, xDone: 0, x: new Float32Array(n),
+      lowBin: Math.round(150 / (fs / N)), snLo: Math.round(1500 / (fs / N)), snHi: Math.min(N / 2 - 1, Math.round(5000 / (fs / N))),
+      flux: new Float32Array(total), lowFlux: new Float32Array(total), snFlux: new Float32Array(total),
+      rms: new Float32Array(total), cent: new Float32Array(total), low: new Float32Array(total),
+      prev: new Float32Array(N / 2), re: new Float32Array(N), im: new Float32Array(N),
+    };
+  }
+  // 프레임 S.done ~ upto-1의 특징을 계산한다 (이미 계산한 프레임은 다시 하지 않는다)
+  async function computeFrames(S, upto, onProgress = () => {}) {
+    const { factor, N, HOP, win, x, re, im, lowBin, snLo, snHi } = S, bins = N / 2;
+    upto = Math.min(upto, S.total);
+    const needX = Math.min(S.n, upto * HOP + N);
+    for (let i = S.xDone; i < needX; i++) { let s = 0; for (let k = 0; k < factor; k++) s += S.samples[i * factor + k]; x[i] = s / factor; }
+    S.xDone = Math.max(S.xDone, needX);
+    let prev = S.prev;
+    for (let f = S.done; f < upto; f++) {
       const o = f * HOP;
       let e = 0;
       for (let i = 0; i < N; i++) { const v = x[o + i]; re[i] = v * win[i]; im[i] = 0; e += v * v; }
-      rms[f] = Math.sqrt(e / N);
+      S.rms[f] = Math.sqrt(e / N);
       fft(re, im);
       let fl = 0, num = 0, den = 0, lo = 0, lf = 0, sf = 0;
       const cur = new Float32Array(bins);
@@ -358,10 +445,23 @@ const ENGINE = (() => {
         num += b * m; den += m;
         if (b <= lowBin) lo += m;
       }
-      flux[f] = fl; lowFlux[f] = lf; snFlux[f] = sf; cent[f] = den > 0 ? num / den : 0; low[f] = lo;
+      S.flux[f] = fl; S.lowFlux[f] = lf; S.snFlux[f] = sf; S.cent[f] = den > 0 ? num / den : 0; S.low[f] = lo;
       prev = cur;
-      if (f % 400 === 0) { onProgress(0.6 * f / frames); await tick(); }
+      if (f % 400 === 0) { onProgress(f / Math.max(1, S.total)); await tick(); }
     }
+    S.prev = prev; S.done = Math.max(S.done, upto);
+  }
+  // 곡 전체 분석 (일반 모드, 저장된 분석)
+  async function analyze(samples, sr, onProgress = () => {}) {
+    const S = newFrameState(samples, sr);
+    await computeFrames(S, S.total, (u) => onProgress(0.6 * u));
+    return beatsFromFrames(S, S.total, samples.length / sr, onProgress);
+  }
+  // 프레임 0 ~ frames-1로 템포·박자·박자별 특징을 구한다. duration = 이 프레임들이 덮는 곡 길이(초)
+  async function beatsFromFrames(S, frames, duration, onProgress = () => {}, fix = null) {
+    const { fs, N, HOP } = S, frameRate = fs / HOP;
+    const flux = S.flux.subarray(0, frames), lowFlux = S.lowFlux.subarray(0, frames), snFlux = S.snFlux.subarray(0, frames);
+    const rms = S.rms.subarray(0, frames), cent = S.cent.subarray(0, frames), low = S.low.subarray(0, frames);
 
     // 온셋 포락선: 국소 평균을 빼고 반파 정류, 정규화.
     // 전체 대역과 저역(킥) 대역을 따로 만들어 섞는다 → 하이햇 같은 엇박 소리보다 킥·베이스가 박자를 정하게
@@ -406,6 +506,7 @@ const ENGINE = (() => {
       const den = a - 2 * b + c;
       if (den !== 0) period = bestLag + clamp(0.5 * (a - c) / den, -0.5, 0.5);
     }
+    if (fix && fix.period) period = fix.period;   // 1.9: 점진적 분석은 처음 정한 전체 박자 간격을 유지한다
     onProgress(0.7); await tick();
 
     // 구간별 템포: 8초 창을 1초씩 옮기며 전체 주기의 0.75~1.34배 범위에서 다시 잰다.
@@ -469,7 +570,8 @@ const ENGINE = (() => {
     const near = (f) => { let m = 0; for (let k = -2; k <= 2; k++) { const g = Math.round(f) + k; if (g >= 0 && g < frames) m = Math.max(m, lowFlux[g]); } return m; };
     let onB = 0, offB = 0;
     for (const bf of beatFrames) { onB += near(bf); offB += near(bf + periodAt(bf) / 2); }
-    if (offB > onB * 1.15) for (let i = 0; i < beatFrames.length; i++) beatFrames[i] += periodAt(beatFrames[i]) / 2;
+    const half = fix && fix.half !== undefined ? fix.half : offB > onB * 1.15;   // 1.9: 점진적 분석은 처음 판단을 유지한다
+    if (half) for (let i = 0; i < beatFrames.length; i++) beatFrames[i] += periodAt(beatFrames[i]) / 2;
     while (beatFrames.length && beatFrames[beatFrames.length - 1] >= frames) beatFrames.pop();
     const frameTime = (f) => (f * HOP + N * 0.25) / fs + 0.042;   // 저역 온셋은 조금 늦게 커지므로 보정값을 실측(데모 곡 기준)으로 맞춤
     const raw = beatFrames.map(frameTime);
@@ -519,6 +621,8 @@ const ENGINE = (() => {
     // 박자 사이의 잘게 쪼갠 소리: 각 박자 간격의 1/4·2/4·3/4 지점에 소리가 얼마나 세게 시작하는지 (0~1, 곡 전체 기준)
     const subAt = (t) => { const c = Math.round((t - 0.02) * fs / HOP - N * 0.25 / HOP); let m = 0; for (let k = -2; k <= 2; k++) { const g = c + k; if (g >= 0 && g < frames) m = Math.max(m, envAll[g]); } return m; };
     const sub = beats.map((t, i) => { const L = (i + 1 < beats.length ? beats[i + 1] : t + gIbi) - t; return [1, 2, 3].map((q) => +subAt(t + L * q / 4).toFixed(3)); });
+    // 1.9: 박자 자리의 온셋 세기 (노트 중요도에 씀, sub와 같은 기준 0~1)
+    const onBeat = beats.map((t) => +subAt(t).toFixed(3));
     // 박자마다 킥(저역 '쿵')인지 스네어(고역 '탁')인지: 두 대역의 온셋 세기를 각각 곡 전체 기준으로 맞춘 뒤 비교
     const peakNear = (arr, t) => { const c = Math.round((t - 0.02) * fs / HOP - N * 0.25 / HOP); let m = 0; for (let k = -2; k <= 3; k++) { const g = c + k; if (g >= 0 && g < frames) m = Math.max(m, arr[g]); } return m; };
     const kRaw = beats.map((t) => peakNear(lowFlux, t)), sRaw = beats.map((t) => peakNear(snFlux, t));
@@ -534,7 +638,48 @@ const ENGINE = (() => {
       drum = beats.map((_, i) => (((i - downPhase) % 2 + 2) % 2 === 1 && sN[i] >= kN[i] * 0.6 && sN[i] >= 0.35 ? 's' : 'k'));
     }
     onProgress(1);
-    return { bpm, beats, downPhase, intensity, loud, pitch, tempo, sub, rest, drum, duration: samples.length / sr };
+    return { bpm, beats, downPhase, intensity, loud, pitch, tempo, sub, rest, drum, onB: onBeat, duration, period, half };
+  }
+
+  // ---------- 1.9: 점진적 분석 (고정 지연 역추적) ----------
+  // 곡을 앞에서부터 늘려 가며(처음 20초, 그다음 10초씩) 그때까지의 부분으로 박자를 찾고(동적 계획법 + 끝에서 역추적),
+  // 분석한 끝에서 4초보다 앞에 있는 박자만 확정한다. 확정한 박자와 그 특징은 다시 바꾸지 않는다.
+  const PROG = { first: 20, step: 10, lag: 4 };
+  async function analyzeProgressive(samples, sr, onPartial = () => {}, onProgress = () => {}) {
+    const S = newFrameState(samples, sr), dur = samples.length / sr;
+    const C = { bpm: 0, beats: [], downPhase: 0, intensity: [], loud: [], pitch: [], tempo: [], sub: [], rest: [], drum: [], onB: [], duration: dur, partial: true };
+    const keys = ['intensity', 'loud', 'pitch', 'tempo', 'sub', 'rest', 'drum', 'onB'];
+    let phaseSet = false, fix = null;
+    for (let T = Math.min(dur, PROG.first); ; T = Math.min(dur, T + PROG.step)) {
+      const last = T >= dur - 1e-6;
+      const upto = last ? S.total : Math.min(S.total, Math.max(0, Math.floor((T * S.fs - S.N) / S.HOP)));
+      await computeFrames(S, upto);
+      let R = null;
+      try { R = await beatsFromFrames(S, upto, T, () => {}, fix); } catch (e) { R = null; }
+      // 처음 확정할 때의 전체 박자 간격과 반 박 보정 여부는 이후에도 그대로 쓴다 (앞뒤 박자열이 반 박 어긋나지 않게)
+      if (R && !fix && R.beats.some((t) => t <= T - PROG.lag)) fix = { period: R.period, half: R.half };
+      if (R && R.beats.length >= 4) {
+        const lim = last ? Infinity : T - PROG.lag;
+        const gap = 60 / R.bpm;
+        const lastC = C.beats.length ? C.beats[C.beats.length - 1] : -Infinity;
+        for (let i = 0; i < R.beats.length; i++) {
+          const t = R.beats[i];
+          if (t > lim) break;
+          if (t <= lastC + 0.5 * gap) continue;
+          // 마디 첫 박 위치는 처음 확정할 때 정하고 바꾸지 않는다
+          if (!phaseSet) { C.downPhase = (((R.downPhase - i) % 4) + 4) % 4; phaseSet = true; }
+          C.beats.push(t);
+          for (const k of keys) C[k].push(R[k] ? R[k][i] : undefined);
+        }
+        C.bpm = R.bpm;
+      }
+      onProgress(T / dur);
+      if (last) break;
+      onPartial(C, T);
+      await tick();
+    }
+    C.partial = false;
+    return C;
   }
 
   // ---------- 속도 곡선: 기본 속도 × 그 순간 템포 비율 ----------
@@ -605,9 +750,9 @@ const ENGINE = (() => {
   }
   function newRun(stage) {
     const n0 = stage.notes[0];
-    return { arc: makeArc(0, START_Y, n0.time, n0.y), ai: 0, holding: false, relatchJ: -1, relatchN: 0 };
+    return { arc: makeArc(0, START_Y, n0.time, n0.y), ai: 0, holding: false, relatchJ: -1, relatchN: 0, strayN: 0 };
   }
-  const cloneRun = (r) => ({ arc: { ...r.arc }, ai: r.ai, holding: r.holding, relatchJ: r.relatchJ, relatchN: r.relatchN });
+  const cloneRun = (r) => ({ arc: { ...r.arc }, ai: r.ai, holding: r.holding, relatchJ: r.relatchJ, relatchN: r.relatchN, strayN: r.strayN });
   // 동작(누르기·떼기)을 제때 했을 때: 길게 누르기 시작이면 끝 플랑크톤까지 직선으로 미끄러지고,
   // 그 밖에는 지금 위치에서 다음 플랑크톤으로 U자를 새로 그린다
   function applyAction(run, stage, ai, t) {
@@ -662,10 +807,21 @@ const ENGINE = (() => {
           }
         }
       }
-      run.arc = { t0: t, y0: y, t1: t + BUMP_T, y1: y, h: BUMP_H };
-      return { stray: true };
+      const k = run.strayN = (run.strayN || 0) + 1, bh = STRAY_H[k - 1] || 0;
+      if (bh > 0) run.arc = { t0: t, y0: y, t1: t + BUMP_T, y1: y, h: bh };   // 0이면 지금 움직임(떨어지는 중이면 계속 떨어짐)을 그대로 둔다
+      return { stray: true, n: k, sink: bh === 0 };
+    }
+    const good = Math.abs(t - a.time) <= ((DIFF[stage.diff] || DIFF.normal).good ?? GOOD);
+    if (!good && run.strayN > 0 && stage.notes[a.j].kind !== 'start') {
+      // 2.3: 헛누름이 이어지던 중의 Bad는 박자를 맞힌 걸로 치지 않는다. 판정은 Bad지만 다음 플랑크톤으로 뛰어오르지 못하고 헛누름처럼 움직인다
+      // (판정 창이 넓어서 막 누르다 Bad로 걸리는 것만으로 길을 따라가던 문제를 막음)
+      run.ai = ai + 1;
+      const k = run.strayN = run.strayN + 1, bh = STRAY_H[k - 1] || 0;
+      if (bh > 0) run.arc = { t0: t, y0: arcY(run.arc, t), t1: t + BUMP_T, y1: arcY(run.arc, t), h: bh };
+      return { ai, j: a.j, d: t - a.time, flail: true, n: k, sink: bh === 0 };
     }
     applyAction(run, stage, ai, t);
+    if (good) run.strayN = 0;   // 2.3: Good 이상이면 헛누름 횟수 처음부터
     return { ai, j: a.j, d: t - a.time };
   }
   const posY = (run, t) => arcY(run.arc, t);
@@ -955,20 +1111,20 @@ const ENGINE = (() => {
     extendStage(stage, an, 0, prof);
     return stage;
   }
-  function extendStage(stage, an, i0, prof) {
+  function extendStage(stage, an, i0, prof, opts = {}) {
     const diff = DIFF[stage.diff] || DIFF.normal;
     // 1.7: 띠 최대 길이는 물살 레벨 6에서 고른 난이도 값, 한 레벨마다 ∓1 (2~9). 2보다 더 줄어들 만큼은 묶음당 몰아치기를 그만큼 더 낸다
-    const rawMax = (diff.holdMax || HOLD_MAX) - ((prof.level ?? 6) - 6);
-    const holdMax = clamp(rawMax, 2, 9), extraBursts = Math.max(0, 2 - rawMax);
+    // 1.9: 띠 최대 길이 h = clip(h_d − (ℓ − 6), 2, 9). 몰아치기는 노트 밀도로 대신한다
+    const holdMax = clamp((diff.holdMax || HOLD_MAX) - ((prof.level ?? 6) - 6), 2, 9);
     const holdRel = holdMax >= 6 ? 3 : holdMax >= 4 ? 2 : 0;   // 다시 붙기: 띠 최대 6 이상 = 쉬움(3번), 4 이상 = 보통(2번), 그 밖 = 없음
-    stage.holdMax = holdMax; stage.holdRel = holdRel; stage.extraBursts = extraBursts;
+    stage.holdMax = holdMax; stage.holdRel = holdRel;
     const { beats, loud, intensity, tempo } = an;
     const i1 = beats.length, sub = an.sub || [], srcT = an.srcTempo || tempo;
     const track = makeTrack(an);
     stage.track = track; stage.baseSpeed = track.base; stage.duration = an.duration; stage.beats = beats; stage.intensity = intensity;
-    stage.chunks.push({ time: beats[i0] ?? 0, prof });
+    if (!opts.regen) stage.chunks.push({ time: beats[i0] ?? 0, prof });
     // 해류: 동적 난이도가 곡을 빠르게·느리게 한 묶음, 그리고 곡 자체가 4박 넘게 빨라지거나 느려지는 곳
-    if (i0 > 0 && prof.prevRate && Math.abs(prof.rate / prof.prevRate - 1) > 0.01) {
+    if (!opts.regen && i0 > 0 && prof.prevRate && Math.abs(prof.rate / prof.prevRate - 1) > 0.01) {
       stage.events.push({ kind: 'surge', time: beats[i0], end: beats[Math.min(i1 - 1, i0 + 8)], fast: prof.rate > prof.prevRate, mult: prof.rate / prof.prevRate, warn: Math.max(1.6, 4 * 60 / (an.bpm * (tempo[i0] || 1))), dda: true });
     }
     for (let i = i0; i < i1;) {
@@ -979,36 +1135,72 @@ const ENGINE = (() => {
       if (j - i + 1 >= 4) stage.events.push({ kind: 'surge', time: beats[i], end: beats[Math.min(j + 1, i1 - 1)], fast, mult: sum / (j - i + 1), warn: Math.max(1.6, 4 * 60 / (an.bpm * (tempo[i] || 1))) });
       i = j + 1;
     }
-    // 몰아치기: 레벨이 높을수록 많이 (prof.bursts = 이 묶음 최대 횟수). 쉼표: 소리 없는 박자
-    const restB = an.rest || [], burstBeat = new Set();
-    for (let i = i0 + 4, n = 0; i < i1 - 6 && n < (prof.bursts || 0) + extraBursts; i++) {
-      if (((i - an.downPhase) % 4 + 4) % 4 !== 0 || beats[i + 4] - beats[i] < 1.6) continue;
-      if (![0, 1, 2, 3, 4].every((q) => !restB[i + q]) || ![0, 1, 2, 3].every((q) => (intensity[i + q] ?? 0) > 0.45 - 0.05 * extraBursts && ((sub[i + q] || [])[1] || 0) >= 0.12 - 0.02 * extraBursts)) continue;   // 몰아치기를 더 낼 때는 기준도 조금 낮춘다
-      for (let q = 0; q < 4; q++) burstBeat.add(i + q);
-      stage.bursts.push({ time: beats[i], end: beats[i + 4], warn: (beats[i + 4] - beats[i]) / 2 });
-      n++; i += extraBursts ? Math.max(5, 11 - 2 * extraBursts) : 11;
-    }
+    // 쉼표: 소리 없는 박자
+    const restB = an.rest || [], onB = an.onB || [];
     for (let i = Math.max(i0, 1); i < i1; i++) if (restB[i]) { let j = i; while (j + 1 < i1 && restB[j + 1]) j++; stage.rests.push({ time: beats[i], end: beats[Math.min(i1 - 1, j + 1)], warn: 2.2 }); i = j; }
-    // 플랑크톤
+    // 1.9: 중요도 기반 노트 선택. 후보 = 박자 자리와 반 박 자리, 중요도 = 박 위치 가중치 × 온셋 세기
+    //  노트 수 K = 박 수 × 노트 밀도(prof.density). ① 마디 첫 박 ② 노트 사이가 2박 넘게 비지 않게 ③ 나머지는 중요도 순(0.2초 간격 이상)
     const notes = stage.notes, A = stage.actions, firstNew = notes.length;
     const last = notes[notes.length - 1];
+    const isDown = (i) => ((i - an.downPhase) % 4 + 4) % 4 === 0;
+    const cand = [];
+    for (let i = i0; i < i1; i++) {
+      if (restB[i]) continue;
+      cand.push({ i, half: false, t: beats[i], s: (isDown(i) ? 1.0 : 0.8) * (onB[i] ?? 0.5) });
+      if (i + 1 < i1 && !restB[i + 1]) cand.push({ i, half: true, t: (beats[i] + beats[i + 1]) / 2, s: 0.5 * ((sub[i] || [])[1] || 0) });
+    }
+    const K = Math.round((i1 - i0) * (prof.density ?? 1));
+    const pick = new Set(), pickT = last ? [last.time] : [];
+    const take = (c) => { pick.add(c); pickT.push(c.t); };
+    for (const c of cand) if (!c.half && isDown(c.i)) take(c);
+    {
+      let lastI = last ? last.beat : i0 - 1;
+      const downs = cand.filter((c) => !c.half && isDown(c.i)).map((c) => c.i);
+      for (const c of cand) {
+        if (c.half) continue;
+        if (pick.has(c)) { lastI = c.i; continue; }
+        const nxt = downs.find((j) => j > c.i) ?? Infinity;
+        if (nxt - lastI > 2 && c.i - lastI >= 2) { take(c); lastI = c.i; }
+      }
+    }
+    for (const c of cand.filter((x) => !pick.has(x)).sort((x, y) => y.s - x.s)) {
+      if (pick.size >= K) break;
+      if (pickT.every((u) => Math.abs(u - c.t) >= NOTE_GAP)) take(c);
+    }
+    stage.picked = (stage.picked || 0) + pick.size; stage.budget = (stage.budget || 0) + K;
+    const byBeat = new Map();
+    for (const c of pick) { if (!byBeat.has(c.i)) byBeat.set(c.i, {}); byBeat.get(c.i)[c.half ? 'h' : 'b'] = c; }
+    // 플랑크톤: 높이 = 소리 크기, 이웃과 높이 차 제한, 쉼표 앞 노트는 미끄러짐
     let prevY = last ? last.y : START_Y, prevT = last ? last.time : 0;
+    const yOf = (v, t) => {
+      const dt = notes.length ? t - prevT : 1, maxStep = 60 + 200 * dt;
+      let y = clamp(lerp(Y_BOT, Y_TOP, v), prevY - maxStep, prevY + maxStep);
+      if (notes.length && notes[notes.length - 1].glide) y = clamp(Math.max(y, prevY + 70), Y_TOP, Y_BOT + 40);
+      return y;
+    };
     for (let i = i0; i < i1; i++) {
       const t = beats[i];
       if (!notes.length && track.D(t) - track.D(0) < W - JX + 40) continue;
       if (restB[i] && notes.length) { notes[notes.length - 1].glide = true; continue; }
-      const dt = notes.length ? t - prevT : 1, maxStep = 60 + 200 * dt;
-      let y = clamp(lerp(Y_BOT, Y_TOP, loud[i] ?? 0.5), prevY - maxStep, prevY + maxStep);
-      if (notes.length && notes[notes.length - 1].glide) y = clamp(Math.max(y, prevY + 70), Y_TOP, Y_BOT + 40);
-      if (burstBeat.has(i)) y = burstBeat.has(i - 1) ? clamp(prevY - 14, Y_TOP + 10, Y_BOT) : clamp(Math.max(y, Y_TOP + 120), Y_TOP, Y_BOT);
-      const nb = { beat: i, time: t, y, d: track.D(t), drum: diff.drums && an.drum && an.drum[i] === 's' ? 's' : 'k', kind: 'tap' };
-      notes.push(nb); prevY = y; prevT = t;
-      if (burstBeat.has(i) && i + 1 < i1) {
-        nb.burst = true; if (!(prof.burstSnare && diff.drums)) nb.drum = 'k';
-        const th = (t + beats[i + 1]) / 2, yh = clamp(y - 14, Y_TOP + 10, Y_BOT);
-        notes.push({ beat: i, half: true, burst: true, drum: 'k', kind: 'tap', time: th, y: yh, d: track.D(th) });
-        prevY = yh; prevT = th;
+      const e = byBeat.get(i); if (!e) continue;
+      if (e.b) {
+        const y = yOf(loud[i] ?? 0.5, t);
+        const nb = { beat: i, time: t, y, d: track.D(t), drum: diff.drums && an.drum && an.drum[i] === 's' ? 's' : 'k', kind: 'tap' };
+        if (e.h) { nb.burst = true; if (!(prof.burstSnare && diff.drums)) nb.drum = 'k'; }
+        notes.push(nb); prevY = y; prevT = t;
       }
+      if (e.h && notes.length) {
+        const th = e.h.t, y = yOf(((loud[i] ?? 0.5) + (loud[i + 1] ?? 0.5)) / 2, th);
+        notes.push({ beat: i, half: true, burst: true, drum: 'k', kind: 'tap', time: th, y, d: track.D(th) });
+        prevY = y; prevT = th;
+      }
+    }
+    // 반 박 노트가 두 박 이상 이어지는 곳 = 몰아치기 (화면 예고용)
+    {
+      let s = -1, p = -9;
+      const flush = () => { if (s >= 0 && p - s >= 1) { const e = beats[Math.min(i1 - 1, p + 1)]; stage.bursts.push({ time: beats[s], end: e, warn: (e - beats[s]) / 2 }); } };
+      for (let k = firstNew; k < notes.length; k++) { const nt = notes[k]; if (!nt.half) continue; if (nt.beat === p + 1) p = nt.beat; else { flush(); s = p = nt.beat; } }
+      flush();
     }
     // 길게 누르기 띠: 일반 모드와 같은 규칙으로 찾고, 동적 난이도의 holdKeep 비율만큼만 남긴다 (잘할수록 띠가 줄어든다)
     let seed = stage.seed;
@@ -1103,6 +1295,33 @@ const ENGINE = (() => {
     }
     return stage;
   }
+  // 1.9: 보이지 않는 구간 다시 만들기 — tCut 이후 첫 노트(길게 누르기의 중간·끝은 제외)부터 노트·기둥을 지우고 prof로 다시 만든다.
+  //  바로 앞 노트를 아직 누르지 않았으면 해파리의 다음 길은 그 노트를 누를 때 새로 정해지므로 어디서 잘라도 된다.
+  //  이미 눌렀다면(노트 사이가 긴 곳) 마디 첫 박에서 자른다: 마디 첫 박은 어느 난이도에서도 같은 자리·높이에 노트가 놓인다
+  function regenerateFrom(stage, an, tCut, prof, tNow = tCut - 2.5) {
+    const notes = stage.notes, A = stage.actions;
+    const isDown = (i) => ((i - an.downPhase) % 4 + 4) % 4 === 0;
+    let k0 = -1;
+    for (let k = 1; k < notes.length; k++) {
+      const nt = notes[k];
+      if (nt.time < tCut || nt.half || !(nt.kind === 'tap' || nt.kind === 'start')) continue;
+      if (!isDown(nt.beat) && !(notes[k - 1].time > tNow + 0.05)) continue;
+      k0 = k; break;
+    }
+    if (k0 < 1) return null;
+    const i0 = notes[k0].beat, tc = notes[k0].time, oldEnd = stage.duration;
+    notes.length = k0;
+    let q = A.length; while (q > 0 && A[q - 1].j >= k0) q--; A.length = q;
+    for (let p = stage.pillars.length - 1; p >= 0; p--) if (stage.pillars[p].note >= k0 || stage.pillars[p].time >= tCut - 0.3) stage.pillars.splice(p, 1);
+    stage.pillarUpTo = k0;
+    const cut = (arr) => { for (let x = arr.length - 1; x >= 0; x--) if ((arr[x].t ?? arr[x].time) >= tc - 1e-6) arr.splice(x, 1); };
+    cut(stage.subDots); cut(stage.bursts); cut(stage.rests);
+    for (let x = stage.events.length - 1; x >= 0; x--) if (!stage.events[x].dda && stage.events[x].time >= tc - 1e-6) stage.events.splice(x, 1);
+    stage.holds = notes.filter((n) => n.kind === 'start').length;
+    let pd = null; for (const nt of notes) if (nt.kind === 'tap' || nt.kind === 'end') pd = nt.drum; stage.lastDrum = pd;
+    extendStage(stage, an, i0, prof, { regen: true });
+    return { i0, k0, tc, oldEnd };
+  }
   // 창 안만 검사하는 시뮬레이션: t0 − 3초 전까지는 정확히 누른 것으로 두고, 그 뒤 동작에만 오차를 준다
   function runWindow(stage, offset, t0, t1) {
     const A = stage.actions, run = newRun(stage), pre = t0 - 3, evs = [];
@@ -1121,18 +1340,20 @@ const ENGINE = (() => {
   }
 
   // ---------- 무거운 일: 음악 분석 (워커에서도, 화면 스레드에서도 같은 코드) ----------
-  async function job({ samples, channels, sr }, post) {
+  async function job({ samples, channels, sr, progressive }, post) {
     if (!samples && channels) {
       samples = new Float32Array(channels[0].length);
       for (const ch of channels) for (let i = 0; i < samples.length; i++) samples[i] += ch[i] / channels.length;
       await tick();
     }
-    const an = await analyze(samples, sr, (u) => post('progress', { step: 'analyze', u }));
+    const an = progressive   // 1.9: 점진적 분석이면 확정된 박자를 중간중간 보낸다
+      ? await analyzeProgressive(samples, sr, (C, T) => post('partial', { analysis: C, T }), (u) => post('progress', { step: 'analyze', u }))
+      : await analyze(samples, sr, (u) => post('progress', { step: 'analyze', u }));
     if (an.beats.length < 16) throw new Error('beats');
     return { analysis: an };
   }
 
-  return { VERSION, relOf, W, H, JX, HIT_R, PIPE_W, DT, SEABED, START_Y, PERFECT, GOOD, DIFF, fft, analyze, makeTrack, generate, validate, zoneAt,
+  return { VERSION, relOf, W, H, JX, HIT_R, PIPE_W, DT, SEABED, START_Y, PERFECT, GOOD, DIFF, fft, analyze, analyzeProgressive, PROG, regenerateFrom, makeTrack, generate, validate, zoneAt,
     newEndless, extendStage, makeArc, arcY, newRun, act, posY, collide, pillarX, playRun, job, clamp, lerp };
 })();
 if (typeof module !== 'undefined') module.exports = ENGINE;
@@ -1263,15 +1484,33 @@ if (typeof WorkerGlobalScope !== 'undefined' && typeof self !== 'undefined' && s
   // ---------- 무한 모드: 고른 곡을 마디 첫 박에서 잘라 바퀴처럼 계속 이어 붙인다 ----------
   // 1바퀴는 처음부터, 2바퀴부터는 앞뒤를 잘라 낸 a~b 구간을 반복. 32박(묶음)마다 동적 난이도가 곡 빠르기(rate)를 정한다
   function loopSource(sg) {
-    const S = sg.analysis, nb = S.beats.length, dp = S.downPhase, isDown = (i) => ((i - dp) % 4 + 4) % 4 === 0;
-    let a = 4; while (a < nb && !isDown(a)) a++;
-    let b = nb - 1; while (b > a && (!isDown(b) || S.beats[b] > S.duration - 1.5)) b--;
-    if (b - a < 16) throw new Error('loop');
-    const an = { bpm: S.bpm, downPhase: dp, beats: [], loud: [], intensity: [], pitch: [], tempo: [], srcTempo: [], sub: [], drum: [], rest: [], duration: 0 };
-    const map = (v) => (v < b ? { si: v, lap: 1 } : { si: a + (v - b) % (b - a), lap: 2 + Math.floor((v - b) / (b - a)) });
+    // 1.9: 분석이 아직 끝나지 않았으면(partial) 확정된 박자까지만 쓰고, 반복 구간 [a, b]는 곡 끝을 안 뒤에 정한다
+    let a = -1, b = -1;
+    const fixLoop = () => {
+      const S = sg.analysis;
+      if (a >= 0 || S.partial) return;
+      const nb = S.beats.length, dp = S.downPhase, isDown = (i) => ((i - dp) % 4 + 4) % 4 === 0;
+      let aa = 4; while (aa < nb && !isDown(aa)) aa++;
+      let bb = nb - 1; while (bb > aa && (!isDown(bb) || S.beats[bb] > S.duration - 1.5)) bb--;
+      if (bb - aa < 16) throw new Error('loop');
+      a = aa; b = bb;
+    };
+    const S0 = sg.analysis;
+    fixLoop();
+    const an = { bpm: S0.bpm, downPhase: S0.downPhase, beats: [], loud: [], intensity: [], pitch: [], tempo: [], srcTempo: [], sub: [], drum: [], rest: [], onB: [], duration: 0 };
+    const map = (v) => (b < 0 || v < b ? { si: v, lap: 1 } : { si: a + (v - b) % (b - a), lap: 2 + Math.floor((v - b) / (b - a)) });
     let v = 0, tNext = null;
     const laps = [];   // 바퀴가 시작된 게임 시각
+    const ready = async (need) => {
+      while (sg.analysis.partial && need >= sg.analysis.beats.length) {
+        if (sg.analysisFailed) throw new Error('analysis');
+        await new Promise((r) => setTimeout(r, 50));
+      }
+      fixLoop();
+    };
     return { an, lapOf: (t) => { let n = 1; for (const L of laps) if (t >= L.t) n = L.lap; return n; }, async next(r, queue) {
+      await ready(v + 33);
+      const S = sg.analysis;
       const i0 = an.beats.length;
       if (tNext === null) tNext = S.beats[0] / r;
       let seg = null;
@@ -1284,6 +1523,7 @@ if (typeof WorkerGlobalScope !== 'undefined' && typeof self !== 'undefined' && s
         seg.end = S.beats[si + 1];
         an.beats.push(t); an.loud.push(S.loud[si]); an.intensity.push(S.intensity[si]); an.pitch.push(S.pitch[si]);
         an.tempo.push((S.tempo[si] || 1) * r); an.srcTempo.push(S.tempo[si] || 1); an.sub.push(S.sub[si]); an.drum.push((S.drum && S.drum[si]) || 'k'); an.rest.push(!!(S.rest && S.rest[si]));
+        an.onB.push(S.onB ? S.onB[si] : undefined);
         tNext = t + (S.beats[si + 1] - S.beats[si]) / r;
       }
       flush();
@@ -1304,21 +1544,58 @@ if (typeof WorkerGlobalScope !== 'undefined' && typeof self !== 'undefined' && s
     const pillarSec = L >= 0.5 ? DDA.gapNear : lerp(DDA.gapFar, DDA.gapNear, L / 0.5);
     const minGap = Math.round(lerp(DDA.minGapWide, DDA.minGapNarrow, L));
     const bursts = L < 0.25 ? 0 : L < 0.6 ? 1 : 2, burstSnare = L > 0.7;   // 잘할수록 몰아치기가 늘고, 아주 잘하면 몰아치기 안에 스네어도 섞인다(보통 이상)
-    return { rate, prevRate: prevRate || rate, holdKeep, pillarSec, minGap, bursts, burstSnare, level: levelOf(L) };
+    const density = 0.6 + 0.8 * L;   // 1.9: 노트 밀도(박당 노트 수) 0.6 ~ 1.4
+    return { rate, prevRate: prevRate || rate, holdKeep, pillarSec, minGap, bursts, burstSnare, density, level: levelOf(L) };
   }
   const levelOf = (L) => 1 + Math.round(L * 9);
   // 1.6: 무한 모드 난이도는 연속 판정으로 바뀐다. Good 이상 STREAK_UP번 연속 → 물살 레벨 +1, Bad 이하(Bad·Miss, 헛누름도 Miss) STREAK_DOWN번 연속 → −1
   //  바뀐 레벨은 다음에 만드는 묶음(32박)부터 적용된다
   const STREAK_UP = 10, STREAK_DOWN = 3, LSTEP = 1 / 9;
+  // 1.9: 시험용 설정 (MJ.setTest로 바꾼다). calib = 시작 레벨 보정, regen = 레벨이 내려가면 재생성, noCache = 저장된 분석을 쓰지 않음
+  const TEST = { calib: true, regen: true, noCache: false };
+  const REGEN_AHEAD = 2.5;   // 지금부터 2.5초 뒤(화면 밖)부터 다시 만든다
+  function regenNow(why) {
+    const en = endless; if (!en || !stage || !stage.endless) return;
+    const g = gameTime(), t0 = performance.now();
+    const prof = { ...profOf(en.L, en.rate), rate: en.rate, prevRate: en.rate };   // 곡 빠르기는 이미 예약된 음악이라 그대로
+    const r = E.regenerateFrom(stage, en.src.an, g + REGEN_AHEAD, prof, g);
+    if (r) { en.chunkL = en.L; en.regens.push({ why, at: g, oldDelay: r.oldEnd - g, newDelay: r.tc - g, ms: performance.now() - t0, level: levelOf(en.L) }); }
+  }
   function ddaHit(good) {
     const en = endless; if (!en || state !== 'playing') return;
     if (good) { en.down = 0; en.up++; } else { en.up = 0; en.down++; }
-    let txt = null;
+    let txt = null, dropped = false;
     if (en.up >= STREAK_UP) { en.up = 0; if (en.L < 1 - 1e-6) { en.L = clamp(en.L + LSTEP, 0, 1); txt = `난이도 ↑ 물살 레벨 ${levelOf(en.L)}`; } }
-    if (en.down >= STREAK_DOWN) { en.down = 0; if (en.L > 1e-6) { en.L = clamp(en.L - LSTEP, 0, 1); txt = `난이도 ↓ 물살 레벨 ${levelOf(en.L)}`; } }
+    if (en.down >= STREAK_DOWN) { en.down = 0; if (en.L > 1e-6) { en.L = clamp(en.L - LSTEP, 0, 1); txt = `난이도 ↓ 물살 레벨 ${levelOf(en.L)}`; dropped = true; } }
     if (levelOf(en.L) >= 10) en.L = 1; else if (levelOf(en.L) <= 1) en.L = 0;   // 끝 레벨에서는 끝값으로 맞춘다 (보이지 않는 한 칸이 남지 않게)
     en.maxL = Math.max(en.maxL, en.L);
-    if (txt) { en.flash = performance.now(); popups.push({ x: JX + 26, y: fishY - 70, t: 0, text: txt + ' · 다음 물살부터', small: true, col: txt.includes('↑') ? '#b4ffd2' : '#ffc4dc' }); }
+    const soon = dropped && en.regen;
+    if (txt) { en.flash = performance.now(); popups.push({ x: JX + 26, y: fishY - 70, t: 0, text: txt + (soon ? ' · 곧 쉬워져요' : ' · 다음 물살부터'), small: true, col: txt.includes('↑') ? '#b4ffd2' : '#ffc4dc' }); }
+    if (soon) regenNow('down');
+    drawDda();
+  }
+  // 1.9: 실력 추정으로 시작 레벨 보정. 첫 32번 판정의 시각 오차 |e| 중앙값 m → σ₀ = m / (0.6745 r)
+  //  성공률 p*(약 74%)가 되는 빠르기 r* = 0.889 G / σ₀ (G = Good 기준) → 그 빠르기에 맞는 레벨
+  const CALIB_N = 32, MISS_ERR = 2000;
+  function calibPush(errMs) {
+    const en = endless; if (!en || !en.calib || en.calibrated || state !== 'playing') return;
+    en.errs.push(errMs);
+    if (en.errs.length < CALIB_N) return;
+    en.calibrated = true;
+    const s = [...en.errs].sort((x, y) => x - y);
+    const m = Math.min(200, s[s.length >> 1]);
+    const G = ((E.DIFF[diffKey] || E.DIFF.normal).good) * 1000;
+    const sigma0 = Math.max(1, m) / 0.6745 / en.rate;
+    const rT = 0.889 * G / sigma0;
+    const L = Math.round(clamp((rT - 0.75) / 0.5, 0, 1) * 9) / 9;
+    en.calibInfo = { m, sigma0, rT, from: levelOf(en.L), to: levelOf(L) };
+    const changed = levelOf(L) !== levelOf(en.L);
+    en.L = L; en.up = en.down = 0; en.calibRate = true; en.maxL = Math.max(en.maxL, en.L);
+    if (changed) {
+      en.flash = performance.now();
+      popups.push({ x: JX + 26, y: fishY - 70, t: 0, text: `실력에 맞춰 물살 레벨 ${levelOf(L)}`, small: true, col: '#b4ffd2' });
+      if (en.regen) regenNow('calib');
+    }
     drawDda();
   }
   function drawDda() {
@@ -1361,7 +1638,8 @@ if (typeof WorkerGlobalScope !== 'undefined' && typeof self !== 'undefined' && s
       setStep('validate', 0.5, '이음매 확인 중');
       await new Promise((r) => setTimeout(r, 0));
       stage = E.newEndless(src.an, diffKey, prof); report = { ok: true };
-      endless = { src, L, maxL: L, chunkL: L, rate: prof.rate, maxRate: prof.rate, up: 0, down: 0, flash: undefined, busy: false, msg: '', msgSub: '', msgAt: undefined };
+      endless = { src, L, maxL: L, chunkL: L, rate: prof.rate, maxRate: prof.rate, up: 0, down: 0, flash: undefined, busy: false, msg: '', msgSub: '', msgAt: undefined,
+        calib: TEST.calib, regen: TEST.regen, errs: [], calibrated: false, calibRate: false, calibInfo: null, regens: [], genMs: [] };
       startPlay();
     } catch (e) { console.warn(e); if (loadId === myLoad) { if (normalSaved) ({ stage, report } = normalSaved); failLoad('endless'); } }
   }
@@ -1372,16 +1650,20 @@ if (typeof WorkerGlobalScope !== 'undefined' && typeof self !== 'undefined' && s
     const before = en.chunkL;   // 지난 묶음을 만들 때의 레벨 (레벨은 플레이 중 연속 판정으로 바뀐다)
     en.chunkL = en.L;
     try {
-      const prof = profOf(en.L, en.rate);
+      const prof = en.calibRate ? { ...profOf(en.L, null), prevRate: en.rate } : profOf(en.L, en.rate);   // 1.9: 보정 직후 한 번은 5% 제한 없이
+      en.calibRate = false;
+      const t0 = performance.now();
       const i0 = await en.src.next(prof.rate, queueAudio);
       if (endless !== en || !stage || !stage.endless) return;
+      const tg = performance.now();
       E.extendStage(stage, en.src.an, i0, prof);
-      const t0 = stage.chunks[stage.chunks.length - 1].time;
+      en.genMs.push({ total: performance.now() - t0, gen: performance.now() - tg });
+      const tc0 = stage.chunks[stage.chunks.length - 1].time;
       if (prof.rate !== en.rate || levelOf(en.L) !== levelOf(before)) {
         const up = en.L > before || prof.rate > en.rate;
         en.msg = `물살 레벨 ${levelOf(en.L)} ${up ? '↑' : '↓'} · 빠르기 ×${prof.rate.toFixed(2)}`;
         en.msgSub = up ? `Good 이상 ${STREAK_UP}번 연속 · 곡이 빨라지고 띠와 통로가 줄어요` : `Bad 이하 ${STREAK_DOWN}번 연속 · 곡이 느려지고 기둥 사이와 통로가 넓어져요`;
-        en.msgAt = t0;
+        en.msgAt = tc0;
       }
       en.rate = prof.rate; en.maxRate = Math.max(en.maxRate, en.rate);
     } catch (e) { console.warn(e); }
@@ -1451,12 +1733,12 @@ if (typeof WorkerGlobalScope !== 'undefined' && typeof self !== 'undefined' && s
   // run: 엔진의 움직임 상태(지금 그리는 U자). pressQ: 아직 처리 안 한 누른 시각들
   let run = null, simT = 0, songStart = 0, source = null, gainNode = null, pressQ = [], nextAuto = 0, missIdx = 0, midIdx = 0, lastPressT = -9, fishY = E.START_Y, fishVy = 0;
   let score = 0, points = 0, combo = 0, bestCombo = 0, perfects = 0, goods = 0, oks = 0, misses = 0, strays = 0, sparks = [], autoRoute = false, inverted = false, deathAt = 0, deathCause = '';
-  let lastBeatIdx = -1, beatPulse = 0, darkness = 0, popups = [], bubbles = [], flash = 0;
+  let shownCombo = -1, lastBeatIdx = -1, beatPulse = 0, darkness = 0, popups = [], bubbles = [], flash = 0;
   const snow = []; for (let i = 0; i < 70; i++) snow.push({ x: rand(0, W), y: rand(0, H), r: rand(0.5, 1.8), s: rand(6, 22), z: rand(0.2, 1) });
   const rocks = []; for (let i = 0; i < 14; i++) rocks.push({ x: i * 40 + rand(0, 20), r: rand(6, 16) });
   let worldX = 0, streaks = [];
 
-  const screens = ['home', 'loading', 'ready', 'paused', 'result', 'sync'];
+  const screens = ['home', 'tut', 'loading', 'ready', 'paused', 'result', 'sync'];
   function show(id) { for (const s of screens) $(s).hidden = s !== id; $('hud').hidden = !(id === null); }
 
   // ---------- 해파리 (원안 그림·촉수 물리 재사용) ----------
@@ -1616,7 +1898,60 @@ if (typeof WorkerGlobalScope !== 'undefined' && typeof self !== 'undefined' && s
   }
 
   let loadId = 0;
+  // 1.9: 바로 무한 모드 — 점진적 분석으로 앞부분 박자가 확정되면(첫 두 묶음 + 여유) 분석이 끝나기 전에 시작한다
+  let directJob = null, lastStartInfo = null;
+  async function loadSongDirect({ id, name, getBuffer }) {
+    $('homeErr').hidden = true;
+    cancelJob(); if (directJob) { directJob.cancel(); directJob = null; }
+    show('loading'); state = 'loading';
+    const myLoad = ++loadId, tok = {};
+    const t0 = performance.now();
+    try {
+      setStep('decode', 0, name);
+      const buffer = await getBuffer();
+      if (loadId !== myLoad) return;
+      const tDec = performance.now();
+      const anKey = id ? `${id}|${E.VERSION}|an` : null;
+      let cached = null;
+      if (anKey && !TEST.noCache) { const rec = await store.get('maps', anKey); if (rec && rec.analysis) cached = rec.analysis; }
+      song = { id, name, buffer, tok, analysis: cached || { partial: true, beats: [], bpm: 0, downPhase: 0, duration: buffer.duration } };
+      stage = null; report = null; normalSaved = null;
+      let started = false;
+      const begin = () => {
+        if (started || loadId !== myLoad) return;
+        started = true;
+        lastStartInfo = { decodeMs: tDec - t0, waitMs: performance.now() - tDec, beatsAtStart: song.analysis.beats.length, cached: !!cached, finalMs: null };
+        startEndless();
+      };
+      const buildNormal = async () => {
+        const st = E.generate(song.analysis, diffKey), rep = await E.validate(st);
+        if (song && song.tok === tok) normalSaved = { stage: st, report: rep };
+      };
+      if (cached) { song.normalP = buildNormal(); begin(); return; }
+      setStep('analyze', 0, '앞부분부터 분석하는 중 · 박자가 모이면 바로 시작해요');
+      const chans = Array.from({ length: buffer.numberOfChannels }, (_, c) => buffer.getChannelData(c).slice());
+      const job = runJob({ channels: chans, sr: buffer.sampleRate, progressive: true }, (type, d) => {
+        if (!song || song.tok !== tok) return;
+        if (type === 'progress' && !started) setStep('analyze', d.u);
+        if (type === 'partial') { Object.assign(song.analysis, d.analysis); song.analysis.partial = true; if (song.analysis.beats.length >= 66) begin(); }
+      });
+      directJob = job;
+      song.normalP = job.promise.then(async (res) => {
+        if (!song || song.tok !== tok) return;
+        Object.assign(song.analysis, res.analysis); song.analysis.partial = false;
+        if (lastStartInfo) lastStartInfo.finalMs = performance.now() - tDec;
+        if (anKey) store.put('maps', { key: anKey, analysis: res.analysis });
+        begin();   // 짧은 곡: 끝까지 분석해도 66박이 안 되면 여기서 시작
+        await buildNormal();
+      }).catch((e) => { if (song && song.tok === tok) { song.analysisFailed = true; console.warn(e); if (!started) failLoad(e && e.message); } });
+    } catch (e) {
+      console.warn(e);
+      if (loadId === myLoad) failLoad(e && e.message);
+    }
+  }
+  const directMode = () => { const el = $('directChk'); return !!(el && el.checked); };
   async function loadSong({ id, name, getBuffer }) {
+    if (directMode()) return loadSongDirect({ id, name, getBuffer });
     $('homeErr').hidden = true;
     cancelJob();
     show('loading'); state = 'loading';
@@ -1805,7 +2140,12 @@ if (typeof WorkerGlobalScope !== 'undefined' && typeof self !== 'undefined' && s
   }
   function startSong() { endless = null; startPlay(); }
   function retry() { if (endless) startEndless(); else startPlay(); }
-  function leaveEndless() { endless = null; if (stage && stage.endless && normalSaved) ({ stage, report } = normalSaved); openReady(); }
+  async function leaveEndless() {
+    endless = null;
+    if (stage && stage.endless && !normalSaved && song && song.normalP) { show('loading'); state = 'loading'; setStep('validate', 0.5, '일반 모드 맵을 마무리하는 중'); await song.normalP; }
+    if (stage && stage.endless && normalSaved) ({ stage, report } = normalSaved);
+    openReady();
+  }
 
   // 누른 시각을 오디오 시계로 기록만 하고, 실제 처리는 고정 스텝 진행 안에서 시간 순서대로 한다
   function tap() {
@@ -1846,6 +2186,7 @@ if (typeof WorkerGlobalScope !== 'undefined' && typeof self !== 'undefined' && s
       if (combo >= 3) popups.push({ x: px, y: py + 18, t: 0, text: '콤보 끊김', small: true, col: '#c7d3e6' });
       combo = 0;
       popups.push({ x: px, y: py, t: 0, text: 'Miss · 일찍 뗌', col: '#ff9a9a' });
+      calibPush(MISS_ERR);
       ddaHit(false);
       return;
     }
@@ -1856,12 +2197,15 @@ if (typeof WorkerGlobalScope !== 'undefined' && typeof self !== 'undefined' && s
       strays++; misses++; perfStreak = 0;
       if (combo >= 3) popups.push({ x: px, y: py + 18, t: 0, text: '콤보 끊김', small: true, col: '#c7d3e6' });
       combo = 0;
-      popups.push({ x: px, y: py, t: 0, text: 'Miss · 헛누름', small: true, col: '#ff9a9a' });
+      // 2.3: 헛누름이 이어질수록 덜 튀고, 4번째부터는 튀지 않고 가라앉는다
+      popups.push({ x: px, y: py, t: 0, text: r.sink ? 'Miss · 지쳐서 떨어져요' : r.n >= 2 ? 'Miss · 지쳐 가요' : 'Miss · 헛누름', small: true, col: r.sink ? '#ff7a6b' : '#ff9a9a' });
+      calibPush(MISS_ERR);
       ddaHit(false);
       for (let i = 0; i < 3; i++) bubbles.push({ x: JX + rand(-10, 10), y: fishY + 12, r: rand(1, 2.5), vy: rand(20, 50), life: rand(0.4, 0.8) });
       return;
     }
     const n = stage.notes[r.j], ad = Math.abs(r.d);
+    calibPush(ad * 1000);
     stage.actions[r.ai].done = true;
     n.hit = true; lastPressT = t;
     if (n.kind === 'start') popups.push({ x: px, y: py - 22, t: 0, text: '길게 누르기', small: true, col: '#9eeaff' });
@@ -1880,7 +2224,7 @@ if (typeof WorkerGlobalScope !== 'undefined' && typeof self !== 'undefined' && s
       oks++; perfStreak = 0;
       if (combo >= 3) popups.push({ x: px, y: py + 18, t: 0, text: '콤보 끊김', small: true, col: '#c7d3e6' });
       combo = 0;
-      popups.push({ x: px, y: py, t: 0, text: r.d < 0 ? 'Bad · 빠름' : 'Bad · 느림', col: '#ffb27a' });
+      popups.push({ x: px, y: py, t: 0, text: (r.d < 0 ? 'Bad · 빠름' : 'Bad · 느림') + (r.flail ? (r.sink ? ' · 지쳐서 떨어져요' : ' · 지쳐 가요') : ''), col: '#ffb27a' });
       ddaHit(false);
     }
   }
@@ -1889,6 +2233,16 @@ if (typeof WorkerGlobalScope !== 'undefined' && typeof self !== 'undefined' && s
     state = 'dying'; deathAt = performance.now(); deathCause = cause; flash = 0.6; hideBanner();
     stopMusic(0.5);
     setTimeout(() => showResult(false), 900);
+  }
+
+  // 2.0: 등급 기준 만점 = 전부 Perfect로 완주했을 때의 점수 (판정 + 기둥 + 길게 누르기 + 완주 500 + 풀콤보 보너스)
+  function gradeMax(st) {
+    const n = st.actions.length;
+    let judgeMax = 0;
+    for (let k = 1; k <= n; k++) judgeMax += 10 * (1 + Math.min(k, 10));
+    const fcBonus = Math.round(judgeMax * 0.05);
+    const mids = st.notes.filter((x) => x.kind === 'mid').length;
+    return { judgeMax, fcBonus, max: judgeMax + 100 * st.pillars.length + 5 * mids + 500 + fcBonus };
   }
 
   function showResult(cleared) {
@@ -1900,6 +2254,7 @@ if (typeof WorkerGlobalScope !== 'undefined' && typeof self !== 'undefined' && s
       const judged = perfects + goods + oks + misses - strays;   // 박자 정확도는 플랑크톤 판정만 (헛누름 제외)
       $('resTag').textContent = `무한 모드 · ${song.name}`;
       $('resTitle').textContent = `${fmtTime(Math.max(0, simT))} 동안 헤엄쳤어요`;
+      $('rBar').hidden = true; $('rGradeRow').hidden = true; $('rProgLabel').textContent = '통과 기둥';   // 무한 모드: 만점이 없어 등급을 매기지 않음
       $('rScore').textContent = points; $('rProg').textContent = String(score);
       $('rAcc').textContent = judged ? Math.round((100 * (perfects + goods)) / judged) + '%' : '-';
       $('rBest').textContent = `${en.src.lapOf(simT)}바퀴째 · 최고 물살 레벨 ${levelOf(en.maxL)} · 최고 빠르기 ×${en.maxRate.toFixed(2)} · Perfect ${perfects} · Good ${goods} · Bad ${oks} · Miss ${misses} · 최고 콤보 ${bestCombo} · 이 곡 무한 모드(${E.DIFF[diffKey].name}) 최고 ${best}점`;
@@ -1908,6 +2263,18 @@ if (typeof WorkerGlobalScope !== 'undefined' && typeof self !== 'undefined' && s
     }
     $('resTag').textContent = cleared ? '완주' : '게임 오버';
     if (cleared) points += 500;
+    // 2.0: 풀콤보 = 콤보가 한 번도 끊기지 않고 완주 (Good 허용). 보너스 = 판정 만점의 5%
+    const gm = gradeMax(stage), fullCombo = cleared && oks === 0 && misses === 0;
+    if (fullCombo) points += gm.fcBonus;
+    const allPerfect = fullCombo && goods === 0;
+    const ratio = allPerfect ? 1 : Math.min(0.999, points / gm.max);   // 반올림으로 100%가 되지 않게
+    const grade = allPerfect ? 'ALL Perfect!' : ratio >= 0.97 ? 'S+' : ratio >= 0.93 ? 'S' : ratio >= 0.85 ? 'A' : ratio >= 0.7 ? 'B' : ratio >= 0.5 ? 'C' : 'F';
+    $('rBar').hidden = false; $('rGradeRow').hidden = false; $('rProgLabel').textContent = '통과 기둥(진행률)';
+    const fill = $('rBarFill'); fill.classList.toggle('top', allPerfect); fill.style.width = '0%';
+    requestAnimationFrame(() => requestAnimationFrame(() => { fill.style.width = (ratio * 100).toFixed(1) + '%'; }));
+    $('rPct').textContent = `${(Math.floor(ratio * 1000) / 10).toFixed(1)}% · ${points} / ${gm.max}점`;
+    $('rGrade').textContent = grade; $('rGrade').classList.toggle('ap', allPerfect);
+    $('rFC').hidden = !fullCombo;
     $('resTitle').textContent = cleared ? '노래 끝까지 헤엄쳤어요!' : deathCause === 'bottom' ? '박자를 놓쳐 아래로 가라앉았어요' : deathCause === 'top' ? '화면 위로 사라졌어요' : '기둥에 부딪혔어요';
     const prog = clamp(simT / stage.duration, 0, 1);
     const judged = perfects + goods + oks + misses - strays;   // 박자 정확도는 플랑크톤 판정만 (헛누름 제외)
@@ -1917,7 +2284,7 @@ if (typeof WorkerGlobalScope !== 'undefined' && typeof self !== 'undefined' && s
     const key = bestKey(song.id || song.name, diffKey);
     let best = bestOf(song.id || song.name, diffKey);
     if (points > best) { best = points; try { localStorage.setItem(key, String(best)); } catch (e) {} }
-    $('rBest').textContent = `Perfect ${perfects} · Good ${goods} · Bad ${oks} · Miss ${misses} · 최고 콤보 ${bestCombo}${cleared ? ' · 완주 +500' : ''} · ${E.DIFF[diffKey].name} 최고 ${best}점`;
+    $('rBest').textContent = `Perfect ${perfects} · Good ${goods} · Bad ${oks} · Miss ${misses} · 최고 콤보 ${bestCombo}${cleared ? ' · 완주 +500' : ''}${fullCombo ? ` · 풀콤보 +${gm.fcBonus}` : ''} · ${E.DIFF[diffKey].name} 최고 ${best}점`;
     $('retryBtn').focus({ preventScroll: true });
   }
 
@@ -1931,7 +2298,7 @@ if (typeof WorkerGlobalScope !== 'undefined' && typeof self !== 'undefined' && s
     if (state !== 'paused') return;
     actx.resume(); state = 'playing'; show(null);
   }
-  function hideBanner() { $('banner').hidden = true; $('gimmick').hidden = true; }
+  function hideBanner() { $('cue').hidden = true; cueKey = ''; $('gimmick').hidden = true; }
   function quitToReady() { stopMusic(0.1); if (actx && actx.state === 'suspended') actx.resume(); leaveEndless(); }
 
   // ---------- 매 프레임 ----------
@@ -1987,6 +2354,7 @@ if (typeof WorkerGlobalScope !== 'undefined' && typeof self !== 'undefined' && s
           if (combo >= 3) popups.push({ x: JX + 26, y: fishY - 16, t: 0, text: '콤보 끊김', small: true, col: '#c7d3e6' });
           combo = 0;
           popups.push({ x: JX + 26, y: fishY - 34, t: 0, text: a.type === 'release' ? 'Miss · 못 뗌' : 'Miss', col: '#ff9a9a' });
+          calibPush(MISS_ERR);
           ddaHit(false);
         }
         // 길게 누르는 동안 지나가는 가운데 플랑크톤: 하나마다 +5점
@@ -2018,8 +2386,13 @@ if (typeof WorkerGlobalScope !== 'undefined' && typeof self !== 'undefined' && s
       $('zone').textContent = `${z.name} · 속도 ${(stage.track.speed(simT) / stage.baseSpeed).toFixed(2)}x`;
       $('progBar').style.width = (endless ? endless.L * 100 : clamp(g / stage.duration, 0, 1) * 100).toFixed(1) + '%';
       $('score').innerHTML = `${points}<small> 점</small>`;
-      $('sub').textContent = endless ? `무한 · ${endless.src.lapOf(g)}바퀴 · 레벨 ${levelOf(endless.L)} · 기둥 ${score}${combo >= 2 ? ` · 콤보 ${combo}` : ''}`
-        : `기둥 ${score}/${stage.pillars.length}${combo >= 2 ? ` · 콤보 ${combo}` : ''}`;
+      $('sub').textContent = endless ? `무한 · ${endless.src.lapOf(g)}바퀴 · 레벨 ${levelOf(endless.L)} · 기둥 ${score}` : `기둥 ${score}/${stage.pillars.length}`;
+      if (combo !== shownCombo) {
+        // 2.3: [콤보 xN]. 오를 때마다 살짝 튀고, 10 이상(점수 배율 최대)이면 빛난다
+        const el = $('combo'); el.textContent = combo >= 2 ? `콤보 x${combo}` : ''; el.classList.toggle('hot', combo >= 10);
+        el.classList.remove('pop'); if (combo > shownCombo && combo >= 2) { void el.offsetWidth; el.classList.add('pop'); }
+        shownCombo = combo;
+      }
       // 해파리 그림은 종 아래쪽이 기준점이라, 종 가운데가 길 위에 오도록 12px 내려 그린다
       const lastDive = run && run.arc && run.arc.h < 0;
       jelly.follow(dt, { y: fishY + 12, vy: fishVy, stroke: simT - lastPressT < 0.09 || (run && run.holding) ? { phase: lastDive ? 'charge' : 'push' } : null }, true);
@@ -2036,8 +2409,42 @@ if (typeof WorkerGlobalScope !== 'undefined' && typeof self !== 'undefined' && s
   }
 
   // 템포 해류: 미리 알려 주고, 가로 물줄기로 보여 준다
+  // 2.1: 예고는 화면 가운데 큰 배너 대신 오른쪽 위 작은 표지(아이콘 + 이름 + 남은 박)로만 보여 준다
+  let cueKey = '';
+  const CUE_ICON = {
+    rest: '<svg viewBox="0 0 16 16"><rect x="3" y="6" width="10" height="4" rx="1" fill="#dfe6f2"/></svg>',
+    burst: '<svg viewBox="0 0 16 16"><circle cx="4" cy="11" r="2.3" fill="none" stroke="#ffbf73" stroke-width="1.6"/><circle cx="8.5" cy="7.5" r="2.3" fill="none" stroke="#ffbf73" stroke-width="1.6"/><circle cx="13" cy="4" r="2.3" fill="none" stroke="#ffbf73" stroke-width="1.6"/></svg>',
+    fast: '<svg viewBox="0 0 16 16"><path d="M3 4l5 4-5 4M8 4l5 4-5 4" fill="none" stroke="#b4ffd2" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+    slow: '<svg viewBox="0 0 16 16"><path d="M13 4L8 8l5 4M8 4L3 8l5 4" fill="none" stroke="#ffc4dc" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+    current: '<svg viewBox="0 0 16 16"><path d="M2 6c2-2 4 2 6 0s4 2 6 0M2 11c2-2 4 2 6 0s4 2 6 0" fill="none" stroke="#9eeaff" stroke-width="1.6" stroke-linecap="round"/></svg>',
+  };
+  function beatsUntil(t, at) { let n = 0; for (const bt of stage.beats) if (bt > t && bt <= at + 1e-3) n++; return Math.max(1, n); }
+  function setCue(kind, name, beats) {
+    const cue = $('cue'), key = kind + '|' + name;
+    cue.hidden = false;
+    if (key !== cueKey) {
+      cueKey = key;
+      cue.className = 'cue ' + kind;
+      cue.querySelector('i').innerHTML = CUE_ICON[kind];
+      cue.querySelector('span').textContent = name;
+      void cue.offsetWidth; cue.classList.add('pop');
+    }
+    // 자리 고르기: ① 오른쪽 위(일시정지 버튼 아래) ② 점수 오른쪽(일시정지 버튼 왼쪽) ③ 왼쪽 HUD 아래.
+    // 무한 모드처럼 왼쪽 HUD 글자가 길게 뻗으면 겹치지 않는 다음 자리로 옮긴다. 어느 자리도 해파리(왼쪽 가운데)와는 겹치지 않는다
+    const fr = frame.getBoundingClientRect(), hit = (a, b) => a.left < b.right + 6 && a.right + 6 > b.left && a.top < b.bottom + 4 && a.bottom + 4 > b.top;
+    const avoid = [$('sub'), $('score'), $('zone'), $('combo')].map((el) => { const r = document.createRange(); r.selectNodeContents(el); return r.getBoundingClientRect(); });   // 글자가 실제로 차지한 폭
+    const spots = [['66px', '14px'], ['18px', '64px'], [Math.round($('score').parentElement.getBoundingClientRect().bottom - fr.top + 8) + 'px', '14px']];
+    for (const [top, right] of spots) {
+      cue.style.top = top; cue.style.right = right;
+      const cr = cue.getBoundingClientRect();
+      if (!avoid.some((r) => hit(cr, r))) break;
+    }
+    cue.classList.toggle('now', beats === 0);
+    cue.querySelector('b').textContent = beats === null ? '' : beats === 0 ? '지금' : beats;
+    cue.querySelector('small').textContent = beats ? '박' : '';
+  }
   function updateGimmicks(dt) {
-    const t = simT, ban = $('banner'), chip = $('gimmick');
+    const t = simT, chip = $('gimmick');
     let warn = null, active = null;
     for (const e of stage.events) {
       if (t >= e.time && t <= e.end) active = e;
@@ -2046,18 +2453,14 @@ if (typeof WorkerGlobalScope !== 'undefined' && typeof self !== 'undefined' && s
     // 표지 우선순위: 쉼표 > 몰아치기 > 해류 예고(4박 전부터 남은 박 세기) > 무한 모드 레벨 안내
     const rw = (stage.rests || []).find((e) => t < e.end && t >= e.time - e.warn);
     const bw = (stage.bursts || []).find((e) => t < e.end && t >= e.time - e.warn);
-    const setBan = (cls, b, sp) => { ban.hidden = false; ban.className = 'banner ' + cls; ban.querySelector('b').textContent = b; ban.querySelector('span').textContent = sp; };
-    if (rw) setBan('rest', t < rw.time ? '쉼표가 와요' : '쉼표 · 손을 멈추세요', '누르지 말고 미끄러져 내려가요');
-    else if (bw) setBan('burst', t < bw.time ? '몰아치기가 와요' : '몰아치기!', '반 박마다 톡톡 · 정확히 타면 솟구쳐요');
+    if (rw) setCue('rest', '쉼표', t < rw.time ? beatsUntil(t, rw.time) : 0);
+    else if (bw) setCue('burst', '몰아치기', t < bw.time ? beatsUntil(t, bw.time) : 0);
     else if (warn) {
-      let beatsLeft = 0; for (const bt of stage.beats) if (bt > t && bt <= warn.time + 1e-3) beatsLeft++; beatsLeft = Math.max(1, beatsLeft);   // 남은 박 수
       const dda = warn.dda && endless && endless.msgAt === warn.time;
-      setBan('surge' + (warn.fast ? '' : ' slow'), dda ? endless.msg : warn.fast ? '돛새치 표지 · 빨라져요' : '거북이 표지 · 느려져요',
-        `${beatsLeft}박 뒤 새 박자 · ${dda ? endless.msgSub : warn.fast ? '플랑크톤이 더 빨리 와요' : '플랑크톤이 천천히 와요'}`);
+      setCue(warn.fast ? 'fast' : 'slow', dda ? endless.msg.split(' · ')[0] : warn.fast ? '돛새치 · 빨라짐' : '거북이 · 느려짐', beatsUntil(t, warn.time));
     } else if (endless && endless.msgAt !== undefined && t >= endless.msgAt - 2.5 && t < endless.msgAt + 1.5) {
-      ban.hidden = false; ban.className = 'banner current';
-      ban.querySelector('b').textContent = endless.msg; ban.querySelector('span').textContent = endless.msgSub;
-    } else ban.hidden = true;
+      setCue('current', endless.msg.split(' · ')[0], null);
+    } else if (!$('cue').hidden) { $('cue').hidden = true; cueKey = ''; }
     if (active) {
       chip.hidden = false; chip.className = 'gimmick surge' + (active.fast ? '' : ' slow');
       chip.textContent = `${active.fast ? '→ 가속' : '← 감속'} 해류 ×${active.mult.toFixed(2)}`;
@@ -2273,28 +2676,39 @@ if (typeof WorkerGlobalScope !== 'undefined' && typeof self !== 'undefined' && s
     $('syncNow').textContent = m === null ? `지금: 자동 (기기에서 알려 준 지연 ${Math.round(latency() * 1000)}ms)` : `지금: ${fmtMs(m)} (직접 맞춤)`;
   }
   function openSync() { syncFrom = state; state = 'sync'; show('sync'); $('syncMsg').textContent = '이어폰을 쓸 거면 이어폰을 낀 채로 해 주세요.'; renderDots(); renderSyncLabel(); }
-  function renderDots() { $('syncDots').textContent = syncing ? '●'.repeat(Math.min(syncTaps.length, 16)) + '○'.repeat(Math.max(0, 16 - syncTaps.length)) : ''; }
+  // 2.3: 딸깍 3번은 3 · 2 · 1 카운트다운(계산에서 뺌), 그다음 SYNC_TAPS번에 맞춰 누른다. SYNC_MIN번 이상 맞으면 중간값을 저장
+  const SYNC_COUNT = 3, SYNC_TAPS = 8, SYNC_MIN = 5, SYNC_IV = 0.6;
+  let syncCountTimers = [];
+  const countTaps = () => syncTaps.filter((t) => syncClicks.length && t >= syncClicks[SYNC_COUNT] - 0.35).length;
+  function renderDots() { const n = countTaps(); $('syncDots').textContent = syncing ? '●'.repeat(Math.min(n, SYNC_TAPS)) + '○'.repeat(Math.max(0, SYNC_TAPS - n)) : ''; }
+  function setSyncCount(txt, go) { const el = $('syncCount'); el.textContent = txt; el.classList.toggle('go', !!go); el.classList.remove('pop'); void el.offsetWidth; if (txt) el.classList.add('pop'); }
+  function clearSyncCount() { for (const id of syncCountTimers) clearTimeout(id); syncCountTimers = []; setSyncCount(''); }
   function startSync() {
     const a = audio(); clearTimeout(syncTimer);
+    clearSyncCount();
     syncClicks = []; syncTaps = []; syncing = true; renderDots();
-    $('syncMsg').textContent = '딸깍 소리에 맞춰 화면을 누르세요 (스페이스도 돼요)';
-    const t0 = a.currentTime + 0.8, iv = 0.6;
-    for (let k = 0; k < 16; k++) {
+    $('syncStart').disabled = true;
+    $('syncMsg').textContent = '딸깍과 같이 3 · 2 · 1을 센 다음부터 박자에 맞춰 누르세요 (스페이스도 돼요)';
+    setSyncCount('준비');
+    const t0 = a.currentTime + 0.8, iv = SYNC_IV, total = SYNC_COUNT + SYNC_TAPS;
+    for (let k = 0; k < total; k++) {
       const t = t0 + k * iv, o = a.createOscillator(), g = a.createGain();
-      o.frequency.value = k % 4 === 0 ? 1760 : 1320; g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(0.5, t + 0.003); g.gain.exponentialRampToValueAtTime(0.0001, t + 0.05);
+      o.frequency.value = k < SYNC_COUNT ? 880 : k === SYNC_COUNT ? 1760 : 1320;   // 카운트다운은 낮은 소리, 누르기 시작은 높은 소리
+      const label = k < SYNC_COUNT ? String(SYNC_COUNT - k) : k === SYNC_COUNT ? '누르세요!' : null;
+      if (label) syncCountTimers.push(setTimeout(() => setSyncCount(label, k >= SYNC_COUNT), Math.max(0, (t - a.currentTime) * 1000))); g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(0.5, t + 0.003); g.gain.exponentialRampToValueAtTime(0.0001, t + 0.05);
       o.connect(g).connect(a.destination); o.start(t); o.stop(t + 0.07); syncClicks.push(t);
     }
-    syncTimer = setTimeout(finishSync, (0.8 + 16 * iv + 0.5) * 1000);
+    syncTimer = setTimeout(finishSync, (0.8 + total * iv + 0.5) * 1000);
   }
   function syncTap() { if (!syncing) return; syncTaps.push(actx.currentTime); renderDots(); }
   function finishSync() {
-    syncing = false; renderDots();
+    syncing = false; renderDots(); clearSyncCount(); $('syncStart').disabled = false;
     const ds = [];
     for (const t of syncTaps) {
       let bi = 0; for (let i = 1; i < syncClicks.length; i++) if (Math.abs(syncClicks[i] - t) < Math.abs(syncClicks[bi] - t)) bi = i;
-      const d = t - syncClicks[bi]; if (bi >= 3 && Math.abs(d) < 0.35) ds.push(d);
+      const d = t - syncClicks[bi]; if (bi >= SYNC_COUNT && Math.abs(d) < 0.35) ds.push(d);
     }
-    if (ds.length < 6) { $('syncMsg').textContent = '누른 횟수가 부족했어요. 다시 측정해 주세요.'; return; }
+    if (ds.length < SYNC_MIN) { $('syncMsg').textContent = '누른 횟수가 부족했어요. 다시 측정해 주세요.'; return; }
     ds.sort((a, b) => a - b);
     const med = ds[ds.length >> 1] * 1000;
     try { localStorage.setItem('fjm-sync', String(Math.round(med))); } catch (e) {}
@@ -2302,11 +2716,13 @@ if (typeof WorkerGlobalScope !== 'undefined' && typeof self !== 'undefined' && s
     renderSyncLabel();
   }
   function nudgeSync(d) { const m = syncMs() ?? Math.round(latency() * 1000); try { localStorage.setItem('fjm-sync', String(m + d)); } catch (e) {} renderSyncLabel(); }
-  function closeSync() { syncing = false; clearTimeout(syncTimer); if (stage && song) openReady(); else goHome(); }
+  function closeSync() { syncing = false; clearTimeout(syncTimer); clearSyncCount(); $('syncStart').disabled = false; if (stage && song) openReady(); else goHome(); }
   $('syncBtn').addEventListener('click', openSync);
   $('syncStart').addEventListener('click', startSync);
   $('syncMinus').addEventListener('click', () => nudgeSync(-10));
   $('syncPlus').addEventListener('click', () => nudgeSync(10));
+  $('syncMinus1').addEventListener('click', () => nudgeSync(-1));
+  $('syncPlus1').addEventListener('click', () => nudgeSync(1));
   $('syncReset').addEventListener('click', () => { try { localStorage.removeItem('fjm-sync'); } catch (e) {} renderSyncLabel(); $('syncMsg').textContent = '자동으로 되돌렸어요.'; });
   $('syncDone').addEventListener('click', closeSync);
 
@@ -2395,11 +2811,95 @@ if (typeof WorkerGlobalScope !== 'undefined' && typeof self !== 'undefined' && s
       else if (state === 'paused') resume();
       else if (state === 'ready') startSong();
       else if (state === 'result') retry();
+    } else if (state === 'home' && !$('tut').hidden && (e.code === 'ArrowRight' || e.code === 'ArrowLeft' || e.code === 'Escape')) {
+      e.preventDefault(); if (e.code === 'Escape') closeTut(); else tutGo(tutIdx + (e.code === 'ArrowRight' ? 1 : -1));
     } else if (e.code === 'KeyP' || e.code === 'Escape') {
       if (state === 'playing') pause(); else if (state === 'paused') resume();
     }
   });
   document.addEventListener('visibilitychange', () => { if (document.hidden) pause(); });
+
+  // ---------- 2.1: 기믹 안내 카드 ----------
+  // 게임 중 큰 배너를 없앤 대신, 시작 화면의 "기믹 안내 보기"에서 기믹을 미리 알려 준다
+  const TUT_SEEN = 'fjm-tut-seen';
+  const svgJelly = (x, y) => `<g transform="translate(${x} ${y})"><ellipse cx="0" cy="-4" rx="13" ry="10" fill="#ff9fd6"/><path d="M-10 4q2 10 0 16M-4 5q2 10 0 16M2 5q2 10 0 16M8 4q2 10 0 16" stroke="#ffb3e6" stroke-width="1.6" fill="none"/></g>`;
+  const svgNote = (x, y, col = '#fff6d6') => `<circle cx="${x}" cy="${y}" r="11" fill="rgba(255,236,170,.18)"/><circle cx="${x}" cy="${y}" r="4.5" fill="${col}"/>`;
+  const svgCap = (txt, y = 122) => `<text x="150" y="${y}" fill="#9fc3d8" font-family="Gowun Dodum, sans-serif" font-size="11" text-anchor="middle">${txt}</text>`;
+  const svgLabel = (x, y, txt, col, size = 14) => `<text x="${x}" y="${y}" fill="${col}" font-family="Jua, sans-serif" font-size="${size}" text-anchor="middle">${txt}</text>`;
+  const svgPillar = (x, gapTop, gapBot) => `<rect x="${x}" y="-5" width="34" height="${gapTop + 5}" fill="#1f9e8a"/><rect x="${x - 4}" y="${gapTop - 8}" width="42" height="10" rx="4" fill="#2bb8a0"/><rect x="${x}" y="${gapBot}" width="34" height="${140 - gapBot}" fill="#1f9e8a"/><rect x="${x - 4}" y="${gapBot}" width="42" height="10" rx="4" fill="#2bb8a0"/>`;
+  const svgKey = (x, y, w, txt) => `<rect x="${x}" y="${y}" width="${w}" height="26" rx="6" fill="rgba(232,247,255,.08)" stroke="#9fc3d8" stroke-width="1.4"/><text x="${x + w / 2}" y="${y + 18}" fill="#e8f7ff" font-family="Jua, sans-serif" font-size="13" text-anchor="middle">${txt}</text>`;
+  const svg = (inner) => `<svg viewBox="0 0 300 130" role="img" aria-hidden="true">${inner}</svg>`;
+  const ALL = ['easy', 'normal', 'hard'];
+  const TUT = [
+    { title: '누르는 키', col: '#e8f7ff', where: ALL,
+      art: svg(`${svgKey(20, 14, 96, '스페이스')}${svgKey(124, 14, 30, '↑')}${svgKey(162, 14, 30, 'W')}${svgKey(204, 50, 30, 'F')}${svgKey(240, 50, 30, 'D')}${svgKey(204, 84, 30, 'J')}${svgKey(240, 84, 30, 'K')}${svgLabel(237, 40, '번갈아 치기', '#ffbf73', 12)}${svgKey(20, 62, 30, 'P')}${svgKey(58, 62, 40, 'Esc')}${svgLabel(128, 80, '일시정지', '#9fc3d8', 12)}${svgCap('화면을 눌러도(터치·클릭) 돼요')}`),
+      items: ['<em>스페이스 · ↑ · W · F · D · J · K</em> 중 아무 키나, 또는 화면을 눌러요.', '몰아치기처럼 빠른 곳은 <em>F · D · J · K</em>를 번갈아 치면 편해요.', '길게 누르기는 여러 키를 쥐고 있어도 마지막 키를 뗄 때 뗀 걸로 쳐요.', '<em>P · Esc</em>: 일시정지 / 다시 하기. 준비 화면에서는 누르는 키로 바로 시작, 결과 화면에서는 다시 하기예요.'] },
+    { title: '판정', col: '#ffe58a', where: ALL,
+      art: svg(`<rect x="30" y="54" width="240" height="22" rx="4" fill="rgba(255,178,122,.25)"/><rect x="75" y="54" width="150" height="22" rx="4" fill="rgba(191,239,255,.35)"/><rect x="120" y="54" width="60" height="22" rx="4" fill="rgba(255,229,138,.7)"/><path d="M150 44v42" stroke="#fff" stroke-width="2"/>${svgLabel(150, 38, 'Perfect', '#ffe58a', 14)}${svgLabel(98, 98, 'Good', '#bfefff', 13)}${svgLabel(202, 98, 'Good', '#bfefff', 13)}${svgLabel(48, 98, 'Bad', '#ffb27a', 13)}${svgLabel(252, 98, 'Bad', '#ffb27a', 13)}${svgCap('가운데(정확한 박자)에서 멀어질수록 낮아져요')}`),
+      items: ['<em>Perfect</em> 쉬움 ±60 · 보통 ±50 · 어려움 ±35ms. 점수 10 × (1+콤보, 콤보는 10까지).', '<em>Good</em> 쉬움 ±150 · 보통 ±100 · 어려움 ±60ms. 점수 5 × (1+콤보). Good 이상이면 기둥을 꼭 지나가요.', '<em>Bad</em>: Good보다 벗어났지만 플랑크톤 근처(최대 ±200ms)예요. 점수 없음, 콤보 끊김.', '<em>Miss</em>: 놓침, 헛누름, 일찍 뗌·못 뗌. 콤보가 끊겨요. 박이 자꾸 빠름·느림으로 뜨면 준비 화면의 <em>싱크 맞추기</em>를 해 보세요.'] },
+    { title: '플랑크톤', col: '#fff1b8', where: ALL,
+      art: svg(`<path d="M40 92Q70 40 100 80Q135 30 170 66Q205 24 240 54" fill="none" stroke="rgba(232,247,255,.55)" stroke-width="2" stroke-dasharray="4 4"/>${svgNote(100, 80)}${svgNote(170, 66)}${svgNote(240, 54)}${svgJelly(40, 92)}${svgLabel(100, 106, '톡', '#fff1b8')}${svgLabel(170, 92, '톡', '#fff1b8')}${svgLabel(240, 80, '톡', '#fff1b8')}${svgCap('높이는 소리 크기, 헤엄 속도는 노래 빠르기')}`),
+      items: ['노래 박자마다 <em>플랑크톤</em>이 놓이고, 그 사이를 물결 길로 이어요.', '해파리가 플랑크톤에 닿는 순간 눌러요. 화면 터치 또는 스페이스·↑·W·F·D·J·K.', '놓치면 가라앉지만, 다음 플랑크톤을 제때 누르면 다시 살아나요.', '근처에 플랑크톤이 없을 때 누르면 <em>Miss(헛누름)</em>예요. 콤보가 끊기고 살짝 튀어 올라요.',] },
+    { title: '기둥', col: '#7fe3c8', where: ALL,
+      art: svg(`${svgPillar(236, 34, 96)}<path d="M40 76Q80 50 120 70Q160 46 200 64Q235 44 270 60" fill="none" stroke="rgba(232,247,255,.55)" stroke-width="2" stroke-dasharray="4 4"/>${svgNote(120, 70)}${svgNote(200, 64)}${svgJelly(40, 76)}${svgLabel(190, 28, '통과 +100', '#7fe3c8', 15)}${svgCap('Good 이상이면 통로를 꼭 지나가요')}`),
+      items: ['<em>기둥</em>에 부딪히면 끝나요. 지날 때마다 +100점.', 'Good 이상으로 누르면 통로를 반드시 지나가도록 길이 열려 있어요.', '화면 위로 사라지거나 아래로 가라앉아도 끝나요.'] },
+    { title: '지친 해파리', col: '#ff9a9a', where: ALL,
+      art: svg(`<path d="M40 70q12 -30 24 0q10 -18 20 0q8 -9 16 0q6 -3 12 0" fill="none" stroke="rgba(255,154,154,.7)" stroke-width="2"/>${svgLabel(52, 32, '톡', '#ff9a9a', 13)}${svgLabel(84, 46, '톡', '#ff9a9a', 12)}${svgLabel(108, 56, '톡', '#ff9a9a', 11)}${svgLabel(126, 62, '톡', '#ff9a9a', 10)}<path d="M150 66Q190 70 214 104" fill="none" stroke="rgba(232,247,255,.55)" stroke-width="2" stroke-dasharray="4 4"/>${svgJelly(214, 92)}${svgLabel(246, 74, '휴…', '#c7d3e6', 14)}${svgLabel(214, 124, '↓', '#ff9a9a', 16)}${svgCap('막 누를수록 덜 튀다가 지쳐서 떨어져요', 18)}`),
+      items: ['박자가 아닐 때 자꾸 누르면 해파리가 <em>지쳐요</em>. 헛누름이 이어질수록 덜 튀어 올라요.', '4번째부터는 힘이 빠져서 눌러도 <em>튀지 않고 떨어져요</em>. 빠르게 연타해도 마찬가지예요.', '지친 채로 Bad를 받아도 다음 플랑크톤까지 뛰지 못해요.', '박자에 맞춰 <em>Good 이상</em>으로 누르면 기운을 되찾아 다시 잘 튀어요.'] },
+    { title: '쉼표', col: '#dfe6f2', where: ALL, cue: 'rest',
+      art: svg(`<rect x="120" y="0" width="80" height="130" fill="rgba(200,210,235,.08)"/>${svgLabel(160, 24, '쉼표 · 손 멈춤', '#dfe6f2', 13)}<path d="M40 50Q75 20 110 44Q160 60 210 96" fill="none" stroke="rgba(232,247,255,.55)" stroke-width="2" stroke-dasharray="4 4"/>${svgNote(110, 44)}${svgNote(210, 96)}${svgJelly(40, 50)}${svgLabel(160, 70, '미끄러지듯 ↘', '#dfe6f2', 13)}${svgCap('누르지 말고 다음 플랑크톤까지 내려가요')}`),
+      items: ['플랑크톤이 비어 있는 박자예요. <em>누르지 말고</em> 미끄러져 내려가요.', '쉼표 뒤 첫 플랑크톤은 앞보다 낮은 곳에 있어요.'] },
+    { title: '길게 누르기 띠', col: '#8cebff', where: ALL,
+      art: svg(`<path d="M80 74Q130 54 180 66T262 56" fill="none" stroke="rgba(140,220,255,.45)" stroke-width="16" stroke-linecap="round"/><path d="M80 74Q130 54 180 66T262 56" fill="none" stroke="rgba(220,250,255,.75)" stroke-width="2.5"/><circle cx="80" cy="74" r="8" fill="none" stroke="#9eeaff" stroke-width="3"/>${[[130, 63], [180, 66], [221, 61]].map(([x, y]) => `<circle cx="${x}" cy="${y}" r="3" fill="#e6fbff"/>`).join('')}<circle cx="262" cy="56" r="9" fill="none" stroke="#9eeaff" stroke-width="3"/>${svgJelly(40, 90)}${svgLabel(80, 104, '누르고', '#8cebff')}${svgLabel(170, 96, '누른 채로', '#8cebff')}${svgLabel(262, 86, '떼기', '#8cebff')}${svgCap('가운데 점마다 +5점')}`),
+      items: ['<em>하늘색 띠</em> 시작에서 누르고, 누른 채로 따라가다 끝 고리에서 떼요.', '일찍 떼거나 끝에서 못 떼면 Miss예요.', '쉬움·보통은 띠에서 떨어져도 가까이서 다시 누르면 다시 붙어요(쉬움 3번, 보통 2번).', '띠 최대 길이: 쉬움 7 · 보통 5 · 어려움 3개.'] },
+    { title: '킥 ↑ / 스네어 ↓', col: '#ff9ad2', where: ['normal', 'hard'],
+      art: svg(`<path d="M40 66Q80 20 120 66Q160 110 200 66Q240 22 270 60" fill="none" stroke="rgba(232,247,255,.55)" stroke-width="2" stroke-dasharray="4 4"/>${svgNote(120, 66, '#ffe3f4')}<path d="M115 47l5-8 5 8z" fill="rgba(255,120,200,.95)"/>${svgNote(200, 66, '#e3f4ff')}<path d="M195 85l5 8 5-8z" fill="rgba(120,200,255,.95)"/>${svgJelly(40, 66)}${svgLabel(80, 18, '킥 · 위로 U', '#ff9ad2', 13)}${svgLabel(160, 120, '스네어 · 아래로 U', '#8ccfff', 13)}`),
+      items: ['<em style="color:#ff9ad2">분홍 ↑</em>: 위로 솟았다 내려오는 U (킥 박자).', '<em style="color:#8ccfff">파랑 ↓</em>: 아래로 파고들었다 올라오는 U (스네어 박자).', '방향이 바뀌는 첫 플랑크톤에만 표시돼요. 누르는 타이밍은 똑같아요.'] },
+    { title: '몰아치기', col: '#ffbf73', where: ['normal', 'hard'], cue: 'burst',
+      art: svg(`<path d="M30 100Q45 70 60 92Q72 62 84 84Q96 54 108 76Q120 46 132 68Q144 38 156 60Q168 30 180 52Q192 22 204 44" fill="none" stroke="rgba(232,247,255,.55)" stroke-width="2" stroke-dasharray="4 4"/>${[[60, 92], [84, 84], [108, 76], [132, 68], [156, 60], [180, 52], [204, 44]].map(([x, y]) => `<circle cx="${x}" cy="${y}" r="7" fill="rgba(255,191,115,.25)" stroke="#ffbf73" stroke-width="2.5"/><circle cx="${x}" cy="${y}" r="2.5" fill="#fff3dd"/>`).join('')}${svgJelly(30, 100)}${svgLabel(252, 40, '반 박마다', '#ffbf73', 15)}${svgLabel(252, 60, '톡톡톡', '#ffbf73', 15)}${svgCap('4박 동안 주황 고리가 촘촘히 이어져요')}`),
+      items: ['<em>주황 고리</em>가 보이면 반 박마다 한 번씩 눌러요.', '정확히 타면 작은 점프가 이어져 위로 솟구쳐요.', '어려움은 몰아치기 안에도 스네어(↓)가 섞여요. 무한 모드에서는 쉬움에도 나와요.'] },
+    { title: '템포 해류', col: '#b4ffd2', where: ALL, cue: 'fast',
+      art: svg(`${[22, 48, 74].map((y) => `<path d="M${150 + y} ${y}h-50" stroke="rgba(170,255,200,.5)" stroke-width="2"/>`).join('')}${[86, 104, 120].map((y) => `<path d="M${30 + y / 4} ${y - 2}h50" stroke="rgba(255,175,210,.45)" stroke-width="2"/>`).join('')}${svgLabel(225, 42, '돛새치 → 빨라져요', '#b4ffd2', 14)}${svgLabel(200, 110, '거북이 → 느려져요', '#ffc4dc', 14)}${svgJelly(40, 60)}`),
+      items: ['<em>돛새치 표지</em>: 플랑크톤이 더 빨리 와요.', '<em style="color:#ffc4dc">거북이 표지</em>: 플랑크톤이 천천히 와요.', '화면 속도도 같이 바뀌어서 플랑크톤 사이 거리는 그대로예요. 리듬만 따라가면 돼요.'] },
+    { title: '드롭 반전', col: '#ffb27a', where: ALL,
+      art: svg(`<rect x="0" y="0" width="150" height="130" fill="rgba(31,126,163,.25)"/><rect x="150" y="0" width="150" height="130" fill="rgba(255,154,77,.12)"/>${svgJelly(60, 70)}<g transform="translate(240 70) scale(-1 1)">${svgJelly(0, 0).replace(/#ff9fd6/, '#ffb27a')}</g>${svgLabel(150, 74, '⇄', '#ffb27a', 28)}${svgCap('곡이 확 터지는 순간 기둥을 지나면')}`),
+      items: ['곡이 확 터지는 순간 기둥을 지나면 화면 <em>좌우가 뒤집히고</em> 색이 바뀌어요.', '보이는 것만 바뀌어요. 판정과 누르는 방법은 그대로예요.', '곡당 최대 한 번, 일반 모드에서만 나와요.'] },
+    { title: '무한 모드', col: '#9eeaff', where: ALL,
+      art: svg(`<path d="M150 64m-46 0a46 30 0 1 0 92 0a46 30 0 1 0 -92 0" fill="none" stroke="rgba(158,234,255,.55)" stroke-width="2" stroke-dasharray="5 4"/><path d="M196 60l4 8 5-7" fill="none" stroke="#9eeaff" stroke-width="2"/>${svgLabel(150, 74, '∞', '#9eeaff', 30)}${svgLabel(52, 40, 'Good×10', '#b4ffd2', 13)}${svgLabel(52, 58, '레벨 ↑', '#b4ffd2', 13)}${svgLabel(250, 40, 'Bad·Miss×3', '#ffc4dc', 13)}${svgLabel(250, 58, '레벨 ↓', '#ffc4dc', 13)}${svgCap('물살 레벨 1 ~ 10')}`),
+      items: ['준비 화면의 <em>이 곡으로 무한 모드</em>를 누르면 곡이 끝나지 않고 계속 이어져요. 기둥에 부딪히거나 화면 밖으로 나가면 끝나요.', '<em>Good 이상 10번 연속</em>이면 물살 레벨이 1 오르고, <em>Bad·Miss 3번 연속</em>이면 1 내려가요(헛누름도 Miss). 왼쪽 위에 남은 횟수가 보여요.', '레벨이 오르면 곡이 빨라지고 길게 누르기 띠가 줄고 기둥 통로가 96px까지 좁아져요. 내려가면 느려지고 기둥 사이와 통로(150px까지)가 넓어져요.', '처음 32번 판정으로 실력을 재서 시작 레벨을 맞춰 줘요. 몰아치기는 쉬움에도 나오고, 드롭 반전은 나오지 않아요.'] },
+  ];
+  const DIFF_NAME = { easy: '쉬움', normal: '보통', hard: '어려움' };
+  let tutIdx = 0;
+  function tutSeen() { try { return !!localStorage.getItem(TUT_SEEN); } catch (e) { return true; } }
+  function renderTut() {
+    const c = TUT[tutIdx], card = $('tutCard');
+    $('tutTag').textContent = `기믹 안내 · ${tutIdx + 1} / ${TUT.length}`;
+    card.style.setProperty('--tc', c.col);
+    $('tutTitle').textContent = c.title; $('tutTitle').style.color = c.col;
+    $('tutArt').innerHTML = c.art;
+    const cueLine = c.cue ? [`게임 중에는 오른쪽 위에 <span class="cuechip">${CUE_ICON[c.cue]}</span> 표지와 <em>남은 박</em>만 작게 떠요.`] : [];
+    $('tutList').innerHTML = c.items.concat(cueLine).map((x) => `<li>${x}</li>`).join('');
+    $('tutWhere').innerHTML = ['easy', 'normal', 'hard'].map((k) => `<span class="${c.where.includes(k) ? 'on' : ''}">${DIFF_NAME[k]}</span>`).join('');
+    $('tutDots').querySelectorAll('button').forEach((b, i) => b.setAttribute('aria-current', i === tutIdx ? 'true' : 'false'));
+    $('tutPrev').disabled = tutIdx === 0;
+    $('tutNext').textContent = tutIdx === TUT.length - 1 ? '다 봤어요' : '다음';
+  }
+  function tutGo(i) { tutIdx = clamp(i, 0, TUT.length - 1); renderTut(); }
+  function openTut() {
+    if (state !== 'home') return;
+    try { localStorage.setItem(TUT_SEEN, '1'); } catch (e) {}
+    $('tutNew').hidden = true;
+    tutIdx = 0; renderTut(); show('tut'); $('hud').hidden = true;
+    $('tutNext').focus({ preventScroll: true });
+  }
+  function closeTut() { show('home'); $('hud').hidden = true; $('tutBtn').focus({ preventScroll: true }); }
+  $('tutDots').innerHTML = TUT.map((c, i) => `<button aria-label="${i + 1}. ${c.title}"></button>`).join('');
+  $('tutDots').querySelectorAll('button').forEach((b, i) => b.addEventListener('click', () => tutGo(i)));
+  $('tutBtn').addEventListener('click', openTut);
+  $('tutPrev').addEventListener('click', () => tutGo(tutIdx - 1));
+  $('tutNext').addEventListener('click', () => { if (tutIdx === TUT.length - 1) closeTut(); else tutGo(tutIdx + 1); });
+  $('tutClose').addEventListener('click', closeTut);
+  $('tutNew').hidden = tutSeen();
 
   // 버전 표기는 엔진의 VERSION 하나에서만 나온다
   document.title = `심해의 노래 ${E.VERSION}`;
@@ -2407,7 +2907,10 @@ if (typeof WorkerGlobalScope !== 'undefined' && typeof self !== 'undefined' && s
   renderSongList();
 
   // 테스트용
-  window.MJ = { routeBot: (v) => { autoRoute = !!v; }, judgeStats: () => ({ perfects, goods, oks, misses, strays, combo, bestCombo }), store, points: () => points, state: () => state, stage: () => stage, report: () => report, song: () => song, score: () => score, simT: () => simT, fishY: () => fishY, tap, diffKey: () => diffKey, endless: () => endless, startEndless, usingWorker: () => !workerBroken && typeof Worker !== 'undefined', pressAt: (t, type) => pressQ.push({ t, type: type || 'press' }), release, run: () => run };
+  window.MJ = { routeBot: (v) => { autoRoute = !!v; }, gradeMax: () => gradeMax(stage), judgeStats: () => ({ perfects, goods, oks, misses, strays, combo, bestCombo }), store, points: () => points, state: () => state, stage: () => stage, report: () => report, song: () => song, score: () => score, simT: () => simT, fishY: () => fishY, tap, diffKey: () => diffKey, endless: () => endless, startEndless, usingWorker: () => !workerBroken && typeof Worker !== 'undefined',
+    E, loopSource, profOf, levelOf, DDA, demos: DEMOS, demoBeats: (sr) => demoSong(sr || 22050).beatTimes, setTest: (o) => Object.assign(TEST, o), test: () => TEST,
+    lastStart: () => lastStartInfo, regens: () => endless && endless.regens, calibInfo: () => endless && endless.calibInfo, genMs: () => endless && endless.genMs,
+    forceDown: () => { if (endless) { endless.down = STREAK_DOWN - 1; ddaHit(false); } }, gameTime: () => gameTime(), pressAt: (t, type) => pressQ.push({ t, type: type || 'press' }), release, run: () => run };
 
 })();
 
