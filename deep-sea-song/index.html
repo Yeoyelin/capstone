@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>심해의 노래 2.3</title>
+<title>심해의 노래 2.6</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -63,6 +63,20 @@ canvas#c { display: block; transition: transform .45s cubic-bezier(.6,0,.3,1); }
 .chip { font-family: var(--body); font-size: 13px; padding: 6px 12px; border-radius: 999px; cursor: pointer; background: rgba(5,11,31,.5); color: var(--foam); border: 1px solid rgba(232,247,255,.3); }
 .chip[aria-pressed="true"] { background: var(--glow); color: #2a0b2a; border-color: var(--glow); font-weight: 700; }
 .label { font-size: 12px; color: var(--ink); letter-spacing: .08em; }
+.label.difflabel { font-size: 16px; color: var(--foam); font-family: var(--display); letter-spacing: .04em; }
+#physChips { flex-wrap: nowrap; }   /* 2.6: 쉬움·보통·어려움은 항상 한 줄에 나란히 */
+#physChips .chip { font-size: 15px; padding: 7px 14px; white-space: nowrap; }
+@media (max-width: 420px) { #physChips { gap: 4px; } #physChips .chip { font-size: 13px; padding: 6px 8px; } }
+.endlesstbl { width: 100%; max-width: 360px; display: grid; gap: 4px; }
+.endlesstbl table { width: 100%; border-collapse: collapse; font-size: 12px; color: var(--ink); font-variant-numeric: tabular-nums; }
+.endlesstbl caption { font-family: var(--display); font-size: 14px; color: #9eeaff; padding-bottom: 4px; }
+.endlesstbl th, .endlesstbl td { padding: 3px 4px; border-bottom: 1px solid rgba(232,247,255,.1); white-space: nowrap; }
+.endlesstbl th[scope="row"] { text-align: left; font-weight: 400; }
+.endlesstbl thead th { font-weight: 700; color: var(--foam); }
+.endlesstbl .on { color: var(--foam); background: rgba(255,179,230,.14); }
+.endlesstbl thead .on { color: var(--glow); }
+@media (max-width: 400px) { .endlesstbl table { font-size: 11px; } .endlesstbl th, .endlesstbl td { white-space: normal; word-break: keep-all; padding: 3px 2px; } }
+.endlessnote { font-size: 11.5px !important; max-width: none !important; line-height: 1.45 !important; }
 
 .steps { display: grid; gap: 6px; text-align: left; font-size: 14px; color: var(--ink); min-width: 230px; }
 .steps div::before { content: "○  "; }
@@ -120,6 +134,15 @@ canvas#c { display: block; transition: transform .45s cubic-bezier(.6,0,.3,1); }
 .tutbtn:focus-visible { outline: 3px solid var(--glow); outline-offset: 2px; }
 .tutbtn small { font-family: var(--body); font-size: 12px; color: var(--ink); }
 .tutbtn .new { position: absolute; top: -6px; right: -4px; font-family: var(--body); font-size: 10px; font-weight: 700; padding: 1px 6px; border-radius: 999px; background: var(--warn); color: #2a1a00; }
+/* 2.5: 시작 화면은 위에서부터 쌓아서, 내 곡 목록이 생기거나 늘어도 기믹 안내 버튼이 제자리에 있게 */
+#home { justify-content: flex-start; padding-top: clamp(28px, 9vh, 76px); }
+#home > * { flex-shrink: 0; }
+/* 2.5: 기믹 안내는 카드 높이를 가장 긴 카드에 맞춰 고정해서 이전·다음 버튼이 움직이지 않게 */
+#tut { justify-content: flex-start; padding-top: 28px; }
+#tut > * { flex-shrink: 0; }
+#tut .tcard { align-content: start; }
+#tut .tcard .where { align-self: end; }
+#tut .row2 .btn { width: 136px; white-space: nowrap; }
 .tutsub { font-size: 12px !important; margin-top: -6px !important; opacity: .85; }
 #tut { gap: 10px; }
 #tut .tcard { width: 100%; max-width: 340px; border-radius: 18px; background: rgba(5,11,31,.6); border: 1px solid rgba(232,247,255,.18); padding: 14px 16px 12px; display: grid; gap: 9px; text-align: left; }
@@ -151,10 +174,13 @@ canvas#c { display: block; transition: transform .45s cubic-bezier(.6,0,.3,1); }
 @keyframes syncPop { from { transform: scale(1.35); opacity: .6; } to { transform: scale(1); opacity: 1; } }
 @media (prefers-reduced-motion: reduce) { .synccount.pop { animation: none; } }
 .tip { font-size: 12.5px; color: var(--ink); max-width: 330px; line-height: 1.5; margin: 0; text-wrap: pretty; }
-.facts { display: flex; gap: 11px; justify-content: center; font-variant-numeric: tabular-nums; }
-.facts div { display: grid; gap: 1px; }
-.facts span { font-size: 11.5px; color: var(--ink); letter-spacing: .06em; }
-.facts strong { font-family: var(--display); font-weight: 400; font-size: 22px; }
+/* 2.5: 칸마다 이름은 한 줄, 값은 한 줄로 맞추고 위쪽을 기준으로 줄을 세움. 덧붙는 설명(길게 N, ms)은 값 밑에 작게 */
+.facts { display: flex; gap: 14px; justify-content: center; align-items: flex-start; font-variant-numeric: tabular-nums; }
+.facts div { display: grid; gap: 2px; justify-items: center; grid-template-rows: auto auto auto; }
+.facts span { font-size: 11.5px; color: var(--ink); letter-spacing: .04em; white-space: nowrap; line-height: 1.3; }
+.facts strong { font-family: var(--display); font-weight: 400; font-size: 22px; white-space: nowrap; line-height: 1.15; }
+.facts em { font-style: normal; font-size: 11px; color: var(--ink); white-space: nowrap; line-height: 1.2; min-height: 1.2em; }
+@media (max-width: 420px) { .facts { gap: 10px; } .facts span { font-size: 10.5px; letter-spacing: 0; } .facts strong { font-size: 20px; } }
 .mapwrap { width: 100%; max-width: 360px; display: grid; gap: 4px; }
 #map { width: 100%; height: auto; border-radius: 8px; background: #071431; }
 .legend { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; font-size: 11.5px; color: var(--ink); }
@@ -162,6 +188,8 @@ canvas#c { display: block; transition: transform .45s cubic-bezier(.6,0,.3,1); }
 .verdict { font-size: 14px !important; color: var(--foam) !important; }
 .verdict b { color: var(--kelp); font-weight: 400; }
 .verdict.bad b { color: var(--warn); }
+.lognote { font-size: 11px; color: var(--ink); opacity: .75; margin: 2px 0 8px; }
+.lognote .linkbtn { font: inherit; color: inherit; background: none; border: 0; padding: 0; text-decoration: underline; cursor: pointer; }
 .result { display: flex; gap: 16px; justify-content: center; font-variant-numeric: tabular-nums; }
 .result div { display: grid; gap: 2px; }
 .result span { font-size: 12px; color: var(--ink); letter-spacing: .06em; }
@@ -183,6 +211,8 @@ canvas#c { display: block; transition: transform .45s cubic-bezier(.6,0,.3,1); }
 .dda { margin-top: 8px; padding: 6px 10px 7px; border-radius: 12px; background: rgba(5,11,31,.5); width: fit-content; display: grid; gap: 4px; font-size: 11.5px; color: var(--ink); font-variant-numeric: tabular-nums; transition: box-shadow .3s; }
 .dda.pulse { box-shadow: 0 0 0 2px rgba(232,247,255,.6); }
 .ddalv { font-family: var(--display); font-size: 14px; color: var(--foam); }
+.ddawin { font-size: 11px; color: var(--ink); }
+.ddawin.wait { color: #9eeaff; }
 .ddarow { display: grid; grid-template-columns: auto 34px auto; column-gap: 6px; align-items: center; }
 .ddarow b { font-weight: 600; text-align: right; color: var(--foam); }
 .ddarow em { font-style: normal; }
@@ -205,13 +235,15 @@ canvas#c { display: block; transition: transform .45s cubic-bezier(.6,0,.3,1); }
           <div class="score" id="score">0<small> / 0</small></div>
           <div class="sub" id="sub">박자 정확도 -</div>
           <div class="zone" id="zone">얕은 바다</div>
-          <div class="combo" id="combo" aria-live="off"></div>
-          <div class="gimmick" id="gimmick" hidden></div>
           <div class="dda" id="dda" hidden>
             <div class="ddalv" id="ddaLv">물살 레벨</div>
-            <div class="ddarow up"><span>Good 이상 연속</span><b id="ddaUpN">0/10</b><em>→ 난이도 ↑</em><i><u id="ddaUpBar"></u></i></div>
-            <div class="ddarow down"><span>Bad 이하 연속</span><b id="ddaDownN">0/3</b><em>→ 난이도 ↓</em><i><u id="ddaDownBar"></u></i></div>
+            <div class="ddarow up"><span>Good 이상</span><b id="ddaUpN">0/25</b><em>→ 레벨 ↑</em><i><u id="ddaUpBar"></u></i></div>
+            <div class="ddarow down"><span>Bad·Miss</span><b id="ddaDownN">0/10</b><em>→ 레벨 ↓</em><i><u id="ddaDownBar"></u></i></div>
+            <div class="ddawin" id="ddaWin">판정 0/32</div>
           </div>
+          <!-- 2.6: 콤보·해류 칩은 난이도 표지 밑 (표지가 위아래로 밀리지 않게) -->
+          <div class="combo" id="combo" aria-live="off"></div>
+          <div class="gimmick" id="gimmick" hidden></div>
         </div>
       </div>
       <button class="iconbtn" id="pauseBtn" aria-label="일시정지"><svg viewBox="0 0 24 24"><rect x="6" y="4" width="4" height="16" rx="1"/><rect x="14" y="4" width="4" height="16" rx="1"/></svg></button>
@@ -221,7 +253,7 @@ canvas#c { display: block; transition: transform .45s cubic-bezier(.6,0,.3,1); }
 
     <!-- 처음 화면 -->
     <div class="overlay" id="home">
-      <div class="tag" id="verTag">PROTOTYPE 2.3 · 음악 모드</div>
+      <div class="tag" id="verTag">PROTOTYPE 2.6 · 음악 모드</div>
       <h1>플래피 젤리피쉬<br>심해의 노래</h1>
       <button class="tutbtn" id="tutBtn"><svg width="18" height="18" viewBox="0 0 16 16" aria-hidden="true"><circle cx="4" cy="11" r="2.3" fill="none" stroke="#ffbf73" stroke-width="1.6"/><circle cx="8.5" cy="7.5" r="2.3" fill="none" stroke="#ffbf73" stroke-width="1.6"/><circle cx="13" cy="4" r="2.3" fill="none" stroke="#ffbf73" stroke-width="1.6"/></svg>기믹 안내 보기 <small>12가지</small><span class="new" id="tutNew" hidden>NEW</span></button>
       <p class="tutsub">처음이라면 1분만 보고 시작해요</p>
@@ -273,12 +305,12 @@ canvas#c { display: block; transition: transform .45s cubic-bezier(.6,0,.3,1); }
       <div class="label">이 노래로 만든 바다</div>
       <div class="songname" id="songName">-</div>
       <div class="facts">
-        <div><span>템포</span><strong id="fBpm">-</strong></div>
-        <div><span>기둥</span><strong id="fCount">-</strong></div>
-        <div><span>플랑크톤</span><strong id="fNotes">-</strong></div>
-        <div><span>해류</span><strong id="fCur">-</strong></div>
-        <div><span>판정 폭(ms)</span><strong id="fTol">-</strong></div>
-        <div><span>속도</span><strong id="fSpd">-</strong></div>
+        <div><span>템포</span><strong id="fBpm">-</strong><em id="fBpmSub"></em></div>
+        <div><span>기둥</span><strong id="fCount">-</strong><em id="fCountSub"></em></div>
+        <div><span>플랑크톤</span><strong id="fNotes">-</strong><em id="fNotesSub"></em></div>
+        <div><span>해류</span><strong id="fCur">-</strong><em id="fCurSub"></em></div>
+        <div><span>판정 폭</span><strong id="fTol">-</strong><em id="fTolSub"></em></div>
+        <div><span>속도</span><strong id="fSpd">-</strong><em id="fSpdSub"></em></div>
       </div>
       <div class="mapwrap">
         <canvas id="map" width="720" height="220" aria-label="스테이지 미리보기 지도"></canvas>
@@ -286,11 +318,13 @@ canvas#c { display: block; transition: transform .45s cubic-bezier(.6,0,.3,1); }
       </div>
       <p class="verdict" id="verdict">-</p>
       <p class="err" id="readyNote" hidden></p>
-      <div class="label">난이도 · 기둥 통로가 보장하는 오차</div>
+      <div class="label difflabel">난이도 판정 범위</div>
       <div class="chips" id="physChips"></div>
+      <!-- 2.6: 무한 모드에서 난이도별로 다른 점 -->
+      <div class="endlesstbl"><table id="endlessTbl"></table><p class="endlessnote" id="endlessNote"></p></div>
+      <button class="btn ghost" id="endlessBtn">이 곡으로 무한 모드</button>
       <div class="row2"><button class="btn ghost" id="otherBtn">다른 곡 고르기</button><button class="btn ghost" id="syncBtn">싱크 맞추기</button></div>
       <button class="btn" id="startBtn">시작하기</button>
-      <button class="btn ghost" id="endlessBtn">이 곡으로 무한 모드</button>
     </div>
 
     <!-- 싱크 맞추기 -->
@@ -331,12 +365,27 @@ canvas#c { display: block; transition: transform .45s cubic-bezier(.6,0,.3,1); }
         <div><span>박자 정확도</span><strong id="rAcc">-</strong></div>
       </div>
       <p id="rBest"></p>
+      <p id="rLogNote" class="lognote" hidden>익명 플레이 기록(곡·난이도·점수·판정)을 게임 개선에 써요. <button type="button" id="rLogOff" class="linkbtn">보내지 않기</button></p>
       <button class="btn" id="retryBtn">다시 하기</button>
       <button class="btn ghost" id="backBtn">곡 화면으로</button>
     </div>
   </div>
 </div>
 
+<script>
+// ===================================================================
+// 2.4: 플레이 기록 DB (Supabase) 설정
+//  Supabase 프로젝트의 Project URL과 Publishable key(또는 anon key)를 아래 두 칸에 넣으면
+//  라운드가 끝날 때마다 기록 1건을 보냅니다. 비어 있으면 아무것도 보내지 않습니다.
+//  이 키는 공개용이라 웹에 올라가도 괜찮습니다(테이블에는 '추가'만 허용해 두었기 때문).
+//  절대 secret key / service_role key는 넣지 마세요.
+// ===================================================================
+window.PLAY_DB_CONFIG = {
+  url: '',      // 예: 'https://abcdxyz.supabase.co'
+  key: '',      // 예: 'sb_publishable_...' 또는 'eyJhbGciOi...' (anon)
+  table: 'play_records',
+};
+</script>
 <script id="engine-src">
 // ===================================================================
 // 심해의 노래 엔진 0.6 — 화면과 분리된 순수 계산 (브라우저·워커·Node 공용)
@@ -347,7 +396,7 @@ canvas#c { display: block; transition: transform .45s cubic-bezier(.6,0,.3,1); }
 // ===================================================================
 const ENGINE = (() => {
   // 버전 하나로 화면 표기·저장 키·캐시 무효화를 모두 맞춘다
-  const VERSION = '2.3';
+  const VERSION = '2.6';
   // ---------- 화면 상수 ----------
   const W = 420, H = 720, JX = W * 0.3, HIT_R = 14, PIPE_W = 72, DT = 1 / 60;
   const SEABED = H - 22;                 // 해저 그림 위치 (충돌 없음: 화면 밖으로 나가야 실패)
@@ -1550,7 +1599,13 @@ if (typeof WorkerGlobalScope !== 'undefined' && typeof self !== 'undefined' && s
   const levelOf = (L) => 1 + Math.round(L * 9);
   // 1.6: 무한 모드 난이도는 연속 판정으로 바뀐다. Good 이상 STREAK_UP번 연속 → 물살 레벨 +1, Bad 이하(Bad·Miss, 헛누름도 Miss) STREAK_DOWN번 연속 → −1
   //  바뀐 레벨은 다음에 만드는 묶음(32박)부터 적용된다
-  const STREAK_UP = 10, STREAK_DOWN = 3, LSTEP = 1 / 9;
+  // 2.6: 연속이 아니라 누적. 판정 WIN_N번을 한 묶음으로 세고, 그 안에서 Good 이상 UP_N번이면 바로 +1, Bad·Miss DOWN_N번이면 바로 −1.
+  //  둘 다 아니면 WIN_N번째 판정에서 0부터 다시 센다. 레벨이 바뀌면 새 레벨로 만든 맵이 화면에 올 때부터 센다(countFrom).
+  //  난이도별 바닥 레벨(FLOOR): 판정 폭이 좁은 어려움이 Bad로 레벨 1까지 내려가 오히려 쉬워지는 것을 막는다.
+  const WIN_N = 32, UP_N = 25, DOWN_N = 10, LSTEP = 1 / 9, CALIB_MAX = 2;
+  const STREAK_UP = UP_N, STREAK_DOWN = DOWN_N;   // 예전 이름 (안내 문구용)
+  const FLOOR = { easy: 1, normal: 3, hard: 6 };
+  const floorL = () => ((FLOOR[diffKey] || 1) - 1) / 9;
   // 1.9: 시험용 설정 (MJ.setTest로 바꾼다). calib = 시작 레벨 보정, regen = 레벨이 내려가면 재생성, noCache = 저장된 분석을 쓰지 않음
   const TEST = { calib: true, regen: true, noCache: false };
   const REGEN_AHEAD = 2.5;   // 지금부터 2.5초 뒤(화면 밖)부터 다시 만든다
@@ -1559,15 +1614,23 @@ if (typeof WorkerGlobalScope !== 'undefined' && typeof self !== 'undefined' && s
     const g = gameTime(), t0 = performance.now();
     const prof = { ...profOf(en.L, en.rate), rate: en.rate, prevRate: en.rate };   // 곡 빠르기는 이미 예약된 음악이라 그대로
     const r = E.regenerateFrom(stage, en.src.an, g + REGEN_AHEAD, prof, g);
-    if (r) { en.chunkL = en.L; en.regens.push({ why, at: g, oldDelay: r.oldEnd - g, newDelay: r.tc - g, ms: performance.now() - t0, level: levelOf(en.L) }); }
+    if (r) { en.chunkL = en.L; en.countFrom = r.tc; en.regens.push({ why, at: g, oldDelay: r.oldEnd - g, newDelay: r.tc - g, ms: performance.now() - t0, level: levelOf(en.L) }); }
   }
   function ddaHit(good) {
     const en = endless; if (!en || state !== 'playing') return;
-    if (good) { en.down = 0; en.up++; } else { en.up = 0; en.down++; }
+    if (simT < en.countFrom) return;   // 2.6: 아직 이전 레벨로 만든 맵 → 세지 않음
+    en.n++; if (good) en.up++; else en.down++;
     let txt = null, dropped = false;
-    if (en.up >= STREAK_UP) { en.up = 0; if (en.L < 1 - 1e-6) { en.L = clamp(en.L + LSTEP, 0, 1); txt = `난이도 ↑ 물살 레벨 ${levelOf(en.L)}`; } }
-    if (en.down >= STREAK_DOWN) { en.down = 0; if (en.L > 1e-6) { en.L = clamp(en.L - LSTEP, 0, 1); txt = `난이도 ↓ 물살 레벨 ${levelOf(en.L)}`; dropped = true; } }
+    const fl = floorL();
+    if (en.up >= UP_N) {
+      en.up = en.down = en.n = 0;
+      if (en.L < 1 - 1e-6) { en.L = clamp(en.L + LSTEP, 0, 1); txt = `난이도 ↑ 물살 레벨 ${levelOf(en.L)}`; en.countFrom = Infinity; }   // 새 레벨 묶음을 만들 때 시각이 정해짐
+    } else if (en.down >= DOWN_N) {
+      en.up = en.down = en.n = 0;
+      if (levelOf(en.L) > levelOf(fl)) { en.L = Math.max(fl, en.L - LSTEP); txt = `난이도 ↓ 물살 레벨 ${levelOf(en.L)}`; dropped = true; en.countFrom = Infinity; }
+    } else if (en.n >= WIN_N) en.up = en.down = en.n = 0;
     if (levelOf(en.L) >= 10) en.L = 1; else if (levelOf(en.L) <= 1) en.L = 0;   // 끝 레벨에서는 끝값으로 맞춘다 (보이지 않는 한 칸이 남지 않게)
+    if (en.L < fl) en.L = fl;
     en.maxL = Math.max(en.maxL, en.L);
     const soon = dropped && en.regen;
     if (txt) { en.flash = performance.now(); popups.push({ x: JX + 26, y: fishY - 70, t: 0, text: txt + (soon ? ' · 곧 쉬워져요' : ' · 다음 물살부터'), small: true, col: txt.includes('↑') ? '#b4ffd2' : '#ffc4dc' }); }
@@ -1587,10 +1650,11 @@ if (typeof WorkerGlobalScope !== 'undefined' && typeof self !== 'undefined' && s
     const G = ((E.DIFF[diffKey] || E.DIFF.normal).good) * 1000;
     const sigma0 = Math.max(1, m) / 0.6745 / en.rate;
     const rT = 0.889 * G / sigma0;
-    const L = Math.round(clamp((rT - 0.75) / 0.5, 0, 1) * 9) / 9;
+    // 2.6: 한 번에 최대 ±2칸, 난이도 바닥 아래로는 내려가지 않음
+    const L = Math.max(floorL(), clamp(Math.round(clamp((rT - 0.75) / 0.5, 0, 1) * 9) / 9, en.L - CALIB_MAX * LSTEP, en.L + CALIB_MAX * LSTEP));
     en.calibInfo = { m, sigma0, rT, from: levelOf(en.L), to: levelOf(L) };
     const changed = levelOf(L) !== levelOf(en.L);
-    en.L = L; en.up = en.down = 0; en.calibRate = true; en.maxL = Math.max(en.maxL, en.L);
+    en.L = L; if (changed) { en.up = en.down = en.n = 0; en.countFrom = Infinity; } en.calibRate = true; en.maxL = Math.max(en.maxL, en.L);
     if (changed) {
       en.flash = performance.now();
       popups.push({ x: JX + 26, y: fishY - 70, t: 0, text: `실력에 맞춰 물살 레벨 ${levelOf(L)}`, small: true, col: '#b4ffd2' });
@@ -1602,9 +1666,12 @@ if (typeof WorkerGlobalScope !== 'undefined' && typeof self !== 'undefined' && s
     const box = $('dda'), en = endless;
     if (!en) { box.hidden = true; return; }
     box.hidden = false;
-    $('ddaUpN').textContent = `${en.up}/${STREAK_UP}`; $('ddaDownN').textContent = `${en.down}/${STREAK_DOWN}`;
-    $('ddaUpBar').style.width = `${en.up / STREAK_UP * 100}%`; $('ddaDownBar').style.width = `${en.down / STREAK_DOWN * 100}%`;
-    $('ddaLv').textContent = `물살 레벨 ${levelOf(en.L)}${en.L >= 1 - 1e-6 ? ' (최고)' : en.L <= 1e-6 ? ' (최저)' : ''}`;
+    $('ddaUpN').textContent = `${en.up}/${UP_N}`; $('ddaDownN').textContent = `${en.down}/${DOWN_N}`;
+    $('ddaUpBar').style.width = `${en.up / UP_N * 100}%`; $('ddaDownBar').style.width = `${en.down / DOWN_N * 100}%`;
+    $('ddaLv').textContent = `물살 레벨 ${levelOf(en.L)}${en.L >= 1 - 1e-6 ? ' (최고)' : levelOf(en.L) <= levelOf(floorL()) ? ' (최저)' : ''}`;
+    const waiting = !(simT >= en.countFrom), w = $('ddaWin');
+    w.textContent = waiting ? '새 레벨 물살이 오면 세기 시작' : `판정 ${en.n}/${WIN_N} · 다 차면 다시 셈`;
+    w.classList.toggle('wait', waiting);
     box.classList.toggle('pulse', en.flash !== undefined && performance.now() - en.flash < 900);
   }
   let endless = null, liveSources = [], audioQueue = [], perfStreak = 0, normalSaved = null;   // normalSaved: 무한 모드에 들어가기 전 일반 맵
@@ -1622,7 +1689,7 @@ if (typeof WorkerGlobalScope !== 'undefined' && typeof self !== 'undefined' && s
     liveSources.push(src);
     src.onended = () => { liveSources = liveSources.filter((x) => x !== src); };
   }
-  function queueAudio(c) { if (state === 'playing' || state === 'paused') playChunk(c); else audioQueue.push(c); }
+  function queueAudio(c) { if (state === 'playing' || state === 'paused' || state === 'resuming') playChunk(c); else audioQueue.push(c); }
   async function startEndless() {
     if (!song || !song.analysis) return;
     audio(); cancelJob(); stopMusic(0.05);
@@ -1631,15 +1698,15 @@ if (typeof WorkerGlobalScope !== 'undefined' && typeof self !== 'undefined' && s
     show('loading'); state = 'loading';
     setStep('generate', 0.2, '이 곡을 바퀴처럼 이어 붙이는 중');
     try {
-      const src = loopSource(song), L = DDA.start, prof = profOf(L, null);
+      const src = loopSource(song), L = Math.max(DDA.start, floorL()), prof = profOf(L, null);
       audioQueue = [];
       await src.next(prof.rate, queueAudio); await src.next(prof.rate, queueAudio);
       if (loadId !== myLoad) return;
       setStep('validate', 0.5, '이음매 확인 중');
       await new Promise((r) => setTimeout(r, 0));
       stage = E.newEndless(src.an, diffKey, prof); report = { ok: true };
-      endless = { src, L, maxL: L, chunkL: L, rate: prof.rate, maxRate: prof.rate, up: 0, down: 0, flash: undefined, busy: false, msg: '', msgSub: '', msgAt: undefined,
-        calib: TEST.calib, regen: TEST.regen, errs: [], calibrated: false, calibRate: false, calibInfo: null, regens: [], genMs: [] };
+      endless = { src, L, maxL: L, chunkL: L, n: 0, countFrom: 0, rate: prof.rate, maxRate: prof.rate, up: 0, down: 0, flash: undefined, busy: false, msg: '', msgSub: '', msgAt: undefined,
+        calib: false, regen: TEST.regen, errs: [], calibrated: false, calibRate: false, calibInfo: null, regens: [], genMs: [] };
       startPlay();
     } catch (e) { console.warn(e); if (loadId === myLoad) { if (normalSaved) ({ stage, report } = normalSaved); failLoad('endless'); } }
   }
@@ -1659,10 +1726,11 @@ if (typeof WorkerGlobalScope !== 'undefined' && typeof self !== 'undefined' && s
       E.extendStage(stage, en.src.an, i0, prof);
       en.genMs.push({ total: performance.now() - t0, gen: performance.now() - tg });
       const tc0 = stage.chunks[stage.chunks.length - 1].time;
+      if (en.countFrom === Infinity && levelOf(en.chunkL) === levelOf(en.L)) { en.countFrom = tc0; drawDda(); }   // 2.6
       if (prof.rate !== en.rate || levelOf(en.L) !== levelOf(before)) {
         const up = en.L > before || prof.rate > en.rate;
         en.msg = `물살 레벨 ${levelOf(en.L)} ${up ? '↑' : '↓'} · 빠르기 ×${prof.rate.toFixed(2)}`;
-        en.msgSub = up ? `Good 이상 ${STREAK_UP}번 연속 · 곡이 빨라지고 띠와 통로가 줄어요` : `Bad 이하 ${STREAK_DOWN}번 연속 · 곡이 느려지고 기둥 사이와 통로가 넓어져요`;
+        en.msgSub = up ? `판정 ${WIN_N}번 중 Good 이상 ${UP_N}번 · 곡이 빨라지고 띠와 통로가 줄어요` : `판정 ${WIN_N}번 중 Bad·Miss ${DOWN_N}번 · 곡이 느려지고 기둥 사이와 통로가 넓어져요`;
         en.msgAt = tc0;
       }
       en.rate = prof.rate; en.maxRate = Math.max(en.maxRate, en.rate);
@@ -1732,14 +1800,14 @@ if (typeof WorkerGlobalScope !== 'undefined' && typeof self !== 'undefined' && s
   try { const v = localStorage.getItem('fjm-diff'); if (E.DIFF[v]) diffKey = v; } catch (e) {}
   // run: 엔진의 움직임 상태(지금 그리는 U자). pressQ: 아직 처리 안 한 누른 시각들
   let run = null, simT = 0, songStart = 0, source = null, gainNode = null, pressQ = [], nextAuto = 0, missIdx = 0, midIdx = 0, lastPressT = -9, fishY = E.START_Y, fishVy = 0;
-  let score = 0, points = 0, combo = 0, bestCombo = 0, perfects = 0, goods = 0, oks = 0, misses = 0, strays = 0, sparks = [], autoRoute = false, inverted = false, deathAt = 0, deathCause = '';
+  let score = 0, points = 0, combo = 0, bestCombo = 0, perfects = 0, goods = 0, oks = 0, misses = 0, strays = 0, sparks = [], autoRoute = false, inverted = false, deathAt = 0, deathCause = '', errN = 0, errSum = 0, errAbs = 0;
   let shownCombo = -1, lastBeatIdx = -1, beatPulse = 0, darkness = 0, popups = [], bubbles = [], flash = 0;
   const snow = []; for (let i = 0; i < 70; i++) snow.push({ x: rand(0, W), y: rand(0, H), r: rand(0.5, 1.8), s: rand(6, 22), z: rand(0.2, 1) });
   const rocks = []; for (let i = 0; i < 14; i++) rocks.push({ x: i * 40 + rand(0, 20), r: rand(6, 16) });
   let worldX = 0, streaks = [];
 
   const screens = ['home', 'tut', 'loading', 'ready', 'paused', 'result', 'sync'];
-  function show(id) { for (const s of screens) $(s).hidden = s !== id; $('hud').hidden = !(id === null); }
+  function show(id) { for (const s of screens) $(s).hidden = s !== id; $('hud').hidden = !(id === null); if (id !== null) $('count').hidden = true; }   // 2.5: 화면이 뜨면 뒤의 카운트다운 숫자는 숨김
 
   // ---------- 해파리 (원안 그림·촉수 물리 재사용) ----------
   const TENTACLES = 6, SEGS = 12, SEG_LEN = 6.2;
@@ -2031,10 +2099,10 @@ if (typeof WorkerGlobalScope !== 'undefined' && typeof self !== 'undefined' && s
     $('songName').textContent = song.name;
     $('fBpm').textContent = Math.round(stage.bpm);
     $('fCount').textContent = stage.pillars.length;
-    $('fNotes').textContent = stage.holds ? `${stage.notes.length} (길게 ${stage.holds})` : stage.notes.length;
+    $('fNotes').textContent = stage.notes.length; $('fNotesSub').textContent = stage.holds ? `길게 ${stage.holds}` : '';
     $('fNotes').title = E.DIFF[diffKey].drums ? `킥 ${stage.kicks} · 스네어 ${stage.snares}` : '';
     $('fCur').textContent = stage.events.length;
-    $('fTol').textContent = '±' + ms;
+    $('fTol').textContent = '±' + ms; $('fTolSub').textContent = 'ms';
     $('fSpd').textContent = stage.baseSpeed < 160 ? '느긋' : stage.baseSpeed < 180 ? '보통' : '빠름';
     renderSyncLabel();
     const v = $('verdict');
@@ -2048,7 +2116,7 @@ if (typeof WorkerGlobalScope !== 'undefined' && typeof self !== 'undefined' && s
     $('startBtn').focus({ preventScroll: true });
   }
 
-  // 난이도 칩 (= 기둥이 보장하는 허용 오차)
+  // 난이도 칩 (= 판정 범위 = 기둥이 보장하는 허용 오차)
   function renderPhysChips() {
     const box = $('physChips'); box.innerHTML = '';
     for (const k of Object.keys(E.DIFF)) {
@@ -2060,6 +2128,20 @@ if (typeof WorkerGlobalScope !== 'undefined' && typeof self !== 'undefined' && s
       });
       box.append(b);
     }
+    renderEndlessTbl();
+  }
+  // 2.6: 난이도 칩 밑 무한 모드 표 (고른 난이도 칸을 강조)
+  function renderEndlessTbl() {
+    const ks = Object.keys(E.DIFF), on = (k) => (k === diffKey ? ' class="on"' : '');
+    const row = (name, f) => `<tr><th scope="row">${name}</th>${ks.map((k) => `<td${on(k)}>${f(k, E.DIFF[k])}</td>`).join('')}</tr>`;
+    $('endlessTbl').innerHTML = `<caption>무한 모드에서는</caption>
+      <thead><tr><th></th>${ks.map((k) => `<th${on(k)}>${E.DIFF[k].name}</th>`).join('')}</tr></thead><tbody>
+      ${row('Good 판정', (k, d) => `±${Math.round(d.good * 1000)}ms`)}
+      ${row('물살 레벨 범위', (k) => `${FLOOR[k]}~10 (시작 ${Math.max(levelOf(DDA.start), FLOOR[k])})`)}
+      ${row('아래로(스네어)', (k, d) => (d.drums ? '나와요' : '없어요'))}
+      ${row('길게 누르기 띠', (k, d) => `최대 ${d.holdMax || 5}개`)}
+      </tbody>`;
+    $('endlessNote').textContent = `곡이 끝나지 않고 이어져요. 판정 ${WIN_N}번마다 세어서 Good 이상 ${UP_N}번이면 레벨 ↑(빨라지고 통로가 좁아짐), Bad·Miss ${DOWN_N}번이면 레벨 ↓. 띠 길이는 레벨 6 기준이고 레벨이 오를수록 짧아져요.`;
   }
 
   // 스테이지 미리보기 지도
@@ -2118,8 +2200,9 @@ if (typeof WorkerGlobalScope !== 'undefined' && typeof self !== 'undefined' && s
     for (const n of stage.notes) { n.hit = false; n.missed = false; n.broken = false; }
     for (const a of stage.actions) a.done = false;
     run = E.newRun(stage); simT = 0; pressQ = []; nextAuto = 0; missIdx = 0; midIdx = 0; lastPressT = -9; fishY = E.START_Y; fishVy = 0;
-    score = 0; points = 0; combo = 0; bestCombo = 0; perfects = 0; goods = 0; oks = 0; misses = 0; strays = 0; sparks = []; lastBeatIdx = -1;
+    score = 0; points = 0; combo = 0; bestCombo = 0; perfects = 0; goods = 0; oks = 0; misses = 0; strays = 0; sparks = []; lastBeatIdx = -1; errN = 0; errSum = 0; errAbs = 0;
     popups = []; bubbles = []; streaks = []; deathAt = 0; setInverted(false); jelly.reset(E.START_Y);
+    { const el = $('combo'); el.textContent = ''; el.classList.remove('hot', 'pop'); shownCombo = 0; }   // 2.5: 지난 판(무한 모드 포함)의 콤보가 카운트다운 동안 남아 보이던 것
     gainNode = a.createGain(); gainNode.gain.value = 1; gainNode.connect(a.destination);
     songStart = a.currentTime + 3;          // 3초 카운트다운 뒤 시작
     perfStreak = 0;
@@ -2206,6 +2289,7 @@ if (typeof WorkerGlobalScope !== 'undefined' && typeof self !== 'undefined' && s
     }
     const n = stage.notes[r.j], ad = Math.abs(r.d);
     calibPush(ad * 1000);
+    errN++; errSum += r.d * 1000; errAbs += ad * 1000;   // 2.4: 박자 오차 (음수 = 빠름)
     stage.actions[r.ai].done = true;
     n.hit = true; lastPressT = t;
     if (n.kind === 'start') popups.push({ x: px, y: py - 22, t: 0, text: '길게 누르기', small: true, col: '#9eeaff' });
@@ -2228,6 +2312,59 @@ if (typeof WorkerGlobalScope !== 'undefined' && typeof self !== 'undefined' && s
       ddaHit(false);
     }
   }
+
+  // ---------- 2.4: 플레이 기록 보내기 (Supabase REST, 실패해도 게임에는 영향 없음) ----------
+  function logPlayerId() {
+    try {
+      let id = localStorage.getItem('fjm-player');
+      if (!id) { id = (crypto.randomUUID ? crypto.randomUUID() : 'p' + Date.now().toString(36) + Math.random().toString(36).slice(2, 10)); localStorage.setItem('fjm-player', id); }
+      return id;
+    } catch (e) { return null; }
+  }
+  function logEnabled() {
+    const c = window.PLAY_DB_CONFIG;
+    if (!c || !c.url || !c.key) return false;
+    try { if (localStorage.getItem('fjm-nolog') === '1') return false; } catch (e) {}
+    return true;
+  }
+  function sendPlayRecord(extra) {
+    const note = $('rLogNote'); if (note) note.hidden = !logEnabled();
+    try {
+      if (!logEnabled() || autoRoute) return;
+      if (typeof navigator !== 'undefined' && navigator.onLine === false) return;
+      const c = window.PLAY_DB_CONFIG;
+      const judged = perfects + goods + oks + misses - strays;
+      const r1 = (v) => Math.round(v * 10) / 10;
+      const rec = Object.assign({
+        player_id: logPlayerId(),
+        game_version: E.VERSION,
+        mode: endless ? 'endless' : 'normal',
+        song_id: String(song.id || '').slice(0, 120) || null,
+        song_name: String(song.name || '').slice(0, 120),
+        difficulty: diffKey,
+        cleared: false,
+        score: points,
+        perfect: perfects, good: goods, bad: oks, miss: misses, stray: strays,
+        best_combo: bestCombo,
+        death_cause: deathCause || null,
+        death_time_s: r1(Math.max(0, simT)),
+        death_y: Math.round(fishY),
+        pillars_passed: score,
+        accuracy_pct: judged ? r1((100 * (perfects + goods)) / judged) : null,
+        hit_count: errN,
+        mean_offset_ms: errN ? r1(errSum / errN) : null,
+        mean_abs_offset_ms: errN ? r1(errAbs / errN) : null,
+        sync_ms: syncMs(),
+      }, extra);
+      if (rec.cleared) { rec.death_cause = null; rec.death_time_s = null; rec.death_y = null; }
+      const headers = { apikey: c.key, 'Content-Type': 'application/json', Prefer: 'return=minimal' };
+      if (/^eyJ/.test(c.key)) headers.Authorization = 'Bearer ' + c.key;   // 예전 anon key(JWT)일 때만
+      fetch(c.url.replace(/\/+$/, '') + '/rest/v1/' + (c.table || 'play_records'), {
+        method: 'POST', headers, body: JSON.stringify(rec), keepalive: true, mode: 'cors',
+      }).catch(() => {});
+    } catch (e) {}
+  }
+  $('rLogOff').addEventListener('click', () => { try { localStorage.setItem('fjm-nolog', '1'); } catch (e) {} $('rLogNote').hidden = true; });
 
   function die(cause) {
     state = 'dying'; deathAt = performance.now(); deathCause = cause; flash = 0.6; hideBanner();
@@ -2258,6 +2395,7 @@ if (typeof WorkerGlobalScope !== 'undefined' && typeof self !== 'undefined' && s
       $('rScore').textContent = points; $('rProg').textContent = String(score);
       $('rAcc').textContent = judged ? Math.round((100 * (perfects + goods)) / judged) + '%' : '-';
       $('rBest').textContent = `${en.src.lapOf(simT)}바퀴째 · 최고 물살 레벨 ${levelOf(en.maxL)} · 최고 빠르기 ×${en.maxRate.toFixed(2)} · Perfect ${perfects} · Good ${goods} · Bad ${oks} · Miss ${misses} · 최고 콤보 ${bestCombo} · 이 곡 무한 모드(${E.DIFF[diffKey].name}) 최고 ${best}점`;
+      sendPlayRecord({ pillars_total: null, progress_pct: null, song_duration_s: null, endless_laps: en.src.lapOf(simT), endless_max_level: levelOf(en.maxL), endless_max_rate: Math.round(en.maxRate * 100) / 100 });
       $('retryBtn').focus({ preventScroll: true });
       return;
     }
@@ -2285,18 +2423,26 @@ if (typeof WorkerGlobalScope !== 'undefined' && typeof self !== 'undefined' && s
     let best = bestOf(song.id || song.name, diffKey);
     if (points > best) { best = points; try { localStorage.setItem(key, String(best)); } catch (e) {} }
     $('rBest').textContent = `Perfect ${perfects} · Good ${goods} · Bad ${oks} · Miss ${misses} · 최고 콤보 ${bestCombo}${cleared ? ' · 완주 +500' : ''}${fullCombo ? ` · 풀콤보 +${gm.fcBonus}` : ''} · ${E.DIFF[diffKey].name} 최고 ${best}점`;
+    sendPlayRecord({ cleared: !!cleared, grade, grade_pct: Math.round(ratio * 1000) / 10, full_combo: fullCombo, pillars_total: stage.pillars.length, progress_pct: Math.round((cleared ? 1 : prog) * 1000) / 10, song_duration_s: Math.round(stage.duration * 10) / 10 });
     $('retryBtn').focus({ preventScroll: true });
   }
 
+  // 2.5: 노래가 나오던 중에 일시정지를 풀면 바로 이어지지 않고 3 → 2 → 1 을 센 뒤 이어진다
+  const RESUME_WAIT = 3;
+  let resumeAt = 0;
   function pause() {
-    if (state !== 'playing') return;
-    state = 'paused'; actx && actx.suspend();
+    if (state !== 'playing' && state !== 'resuming') return;
+    if (state === 'playing') actx && actx.suspend();   // 다시 세는 중이면 소리는 이미 멈춰 있음
+    state = 'paused'; $('count').hidden = true;
     $('pauseInfo').textContent = endless ? `무한 모드 · ${song.name} · ${endless.src.lapOf(simT)}바퀴 · 물살 레벨 ${levelOf(endless.L)} · 빠르기 ×${endless.rate.toFixed(2)} · ${fmtTime(Math.max(0, simT))} · 기둥 ${score} · ${points}점` : `${song.name} · ${fmtTime(Math.max(0, simT))} / ${fmtTime(stage.duration)} · 기둥 ${score}/${stage.pillars.length} · ${points}점`;
     show('paused'); $('resumeBtn').focus({ preventScroll: true });
   }
   function resume() {
     if (state !== 'paused') return;
-    actx.resume(); state = 'playing'; show(null);
+    show(null);
+    if (gameTime() < 0) { actx.resume(); state = 'playing'; return; }   // 시작 전 카운트다운 중이었으면 그 카운트다운이 그대로 이어짐
+    state = 'resuming'; resumeAt = performance.now() + RESUME_WAIT * 1000;
+    $('count').hidden = false; $('count').textContent = RESUME_WAIT;
   }
   function hideBanner() { $('cue').hidden = true; cueKey = ''; $('gimmick').hidden = true; }
   function quitToReady() { stopMusic(0.1); if (actx && actx.state === 'suspended') actx.resume(); leaveEndless(); }
@@ -2322,6 +2468,11 @@ if (typeof WorkerGlobalScope !== 'undefined' && typeof self !== 'undefined' && s
       return;
     }
     if (state === 'paused') return;
+    if (state === 'resuming') {
+      const left = (resumeAt - performance.now()) / 1000;
+      if (left > 0) { $('count').hidden = false; $('count').textContent = Math.ceil(left); return; }
+      $('count').hidden = true; state = 'playing'; actx.resume();
+    }
 
     if (state === 'playing') {
       const g = gameTime();
@@ -2382,7 +2533,7 @@ if (typeof WorkerGlobalScope !== 'undefined' && typeof self !== 'undefined' && s
       const z = E.zoneAt(stage, g);
       darkness = lerp(darkness, z.I, 1 - Math.exp(-1.5 * dt));
       frame.classList.toggle('drop', z.I > 0.66);
-      if (endless && endless.flash !== undefined) drawDda();
+      if (endless && (endless.flash !== undefined || (endless.countFrom > simT) !== $('ddaWin').classList.contains('wait'))) drawDda();
       $('zone').textContent = `${z.name} · 속도 ${(stage.track.speed(simT) / stage.baseSpeed).toFixed(2)}x`;
       $('progBar').style.width = (endless ? endless.L * 100 : clamp(g / stage.duration, 0, 1) * 100).toFixed(1) + '%';
       $('score').innerHTML = `${points}<small> 점</small>`;
@@ -2487,7 +2638,7 @@ if (typeof WorkerGlobalScope !== 'undefined' && typeof self !== 'undefined' && s
       }
     }
     for (const s of snow) { ctx.fillStyle = `rgba(220,240,255,${0.15 + 0.35 * s.z})`; ctx.beginPath(); ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2); ctx.fill(); }
-    const inPlay = stage && (state === 'playing' || state === 'dying' || state === 'paused');
+    const inPlay = stage && (state === 'playing' || state === 'dying' || state === 'paused' || state === 'resuming');
     if (inPlay) for (const p of stage.pillars) {
       const x = E.pillarX(p, simT, stage.track);
       if (x < -PIPE_W - 10 || x > W + 10) continue;
@@ -2814,7 +2965,7 @@ if (typeof WorkerGlobalScope !== 'undefined' && typeof self !== 'undefined' && s
     } else if (state === 'home' && !$('tut').hidden && (e.code === 'ArrowRight' || e.code === 'ArrowLeft' || e.code === 'Escape')) {
       e.preventDefault(); if (e.code === 'Escape') closeTut(); else tutGo(tutIdx + (e.code === 'ArrowRight' ? 1 : -1));
     } else if (e.code === 'KeyP' || e.code === 'Escape') {
-      if (state === 'playing') pause(); else if (state === 'paused') resume();
+      if (state === 'playing' || state === 'resuming') pause(); else if (state === 'paused') resume();
     }
   });
   document.addEventListener('visibilitychange', () => { if (document.hidden) pause(); });
@@ -2865,8 +3016,8 @@ if (typeof WorkerGlobalScope !== 'undefined' && typeof self !== 'undefined' && s
       art: svg(`<rect x="0" y="0" width="150" height="130" fill="rgba(31,126,163,.25)"/><rect x="150" y="0" width="150" height="130" fill="rgba(255,154,77,.12)"/>${svgJelly(60, 70)}<g transform="translate(240 70) scale(-1 1)">${svgJelly(0, 0).replace(/#ff9fd6/, '#ffb27a')}</g>${svgLabel(150, 74, '⇄', '#ffb27a', 28)}${svgCap('곡이 확 터지는 순간 기둥을 지나면')}`),
       items: ['곡이 확 터지는 순간 기둥을 지나면 화면 <em>좌우가 뒤집히고</em> 색이 바뀌어요.', '보이는 것만 바뀌어요. 판정과 누르는 방법은 그대로예요.', '곡당 최대 한 번, 일반 모드에서만 나와요.'] },
     { title: '무한 모드', col: '#9eeaff', where: ALL,
-      art: svg(`<path d="M150 64m-46 0a46 30 0 1 0 92 0a46 30 0 1 0 -92 0" fill="none" stroke="rgba(158,234,255,.55)" stroke-width="2" stroke-dasharray="5 4"/><path d="M196 60l4 8 5-7" fill="none" stroke="#9eeaff" stroke-width="2"/>${svgLabel(150, 74, '∞', '#9eeaff', 30)}${svgLabel(52, 40, 'Good×10', '#b4ffd2', 13)}${svgLabel(52, 58, '레벨 ↑', '#b4ffd2', 13)}${svgLabel(250, 40, 'Bad·Miss×3', '#ffc4dc', 13)}${svgLabel(250, 58, '레벨 ↓', '#ffc4dc', 13)}${svgCap('물살 레벨 1 ~ 10')}`),
-      items: ['준비 화면의 <em>이 곡으로 무한 모드</em>를 누르면 곡이 끝나지 않고 계속 이어져요. 기둥에 부딪히거나 화면 밖으로 나가면 끝나요.', '<em>Good 이상 10번 연속</em>이면 물살 레벨이 1 오르고, <em>Bad·Miss 3번 연속</em>이면 1 내려가요(헛누름도 Miss). 왼쪽 위에 남은 횟수가 보여요.', '레벨이 오르면 곡이 빨라지고 길게 누르기 띠가 줄고 기둥 통로가 96px까지 좁아져요. 내려가면 느려지고 기둥 사이와 통로(150px까지)가 넓어져요.', '처음 32번 판정으로 실력을 재서 시작 레벨을 맞춰 줘요. 몰아치기는 쉬움에도 나오고, 드롭 반전은 나오지 않아요.'] },
+      art: svg(`<path d="M150 64m-46 0a46 30 0 1 0 92 0a46 30 0 1 0 -92 0" fill="none" stroke="rgba(158,234,255,.55)" stroke-width="2" stroke-dasharray="5 4"/><path d="M196 60l4 8 5-7" fill="none" stroke="#9eeaff" stroke-width="2"/>${svgLabel(150, 74, '∞', '#9eeaff', 30)}${svgLabel(52, 40, 'Good 25/32', '#b4ffd2', 13)}${svgLabel(52, 58, '레벨 ↑', '#b4ffd2', 13)}${svgLabel(250, 40, 'Bad·Miss 10', '#ffc4dc', 13)}${svgLabel(250, 58, '레벨 ↓', '#ffc4dc', 13)}${svgCap('물살 레벨 1 ~ 10')}`),
+      items: ['준비 화면의 <em>이 곡으로 무한 모드</em>를 누르면 곡이 끝나지 않고 계속 이어져요. 기둥에 부딪히거나 화면 밖으로 나가면 끝나요.', '판정을 <em>32번씩</em> 세어서 그 안에 <em>Good 이상이 25번</em>이 되면 물살 레벨이 1 오르고, <em>Bad·Miss가 10번</em>이 되면 바로 1 내려가요(헛누름도 Miss, 연속이 아니어도 돼요). 레벨이 바뀌면 새 레벨 물살이 올 때부터 다시 세요. 왼쪽 위에 지금 횟수가 보여요.', '레벨이 오르면 곡이 빨라지고 길게 누르기 띠가 줄고 기둥 통로가 96px까지 좁아져요. 내려가면 느려지고 기둥 사이와 통로(150px까지)가 넓어져요.', '난이도마다 최저 레벨이 있어요(쉬움 1 · 보통 3 · 어려움 6). 몰아치기는 쉬움에도 나오고, 드롭 반전은 나오지 않아요.'] },
   ];
   const DIFF_NAME = { easy: '쉬움', normal: '보통', hard: '어려움' };
   let tutIdx = 0;
@@ -2885,11 +3036,18 @@ if (typeof WorkerGlobalScope !== 'undefined' && typeof self !== 'undefined' && s
     $('tutNext').textContent = tutIdx === TUT.length - 1 ? '다 봤어요' : '다음';
   }
   function tutGo(i) { tutIdx = clamp(i, 0, TUT.length - 1); renderTut(); }
+  // 2.5: 카드마다 내용 길이가 달라 버튼이 오르내리던 것 → 모든 카드를 한 번씩 그려 보고 가장 긴 높이로 고정
+  function fitTut() {
+    const card = $('tutCard'), keep = tutIdx; card.style.minHeight = '';
+    let h = 0; for (let i = 0; i < TUT.length; i++) { tutIdx = i; renderTut(); h = Math.max(h, card.offsetHeight); }
+    tutIdx = keep; renderTut(); card.style.minHeight = h + 'px';
+  }
+  window.addEventListener('resize', () => { if (!$('tut').hidden) fitTut(); });
   function openTut() {
     if (state !== 'home') return;
     try { localStorage.setItem(TUT_SEEN, '1'); } catch (e) {}
     $('tutNew').hidden = true;
-    tutIdx = 0; renderTut(); show('tut'); $('hud').hidden = true;
+    tutIdx = 0; show('tut'); $('hud').hidden = true; fitTut();
     $('tutNext').focus({ preventScroll: true });
   }
   function closeTut() { show('home'); $('hud').hidden = true; $('tutBtn').focus({ preventScroll: true }); }
@@ -2910,7 +3068,7 @@ if (typeof WorkerGlobalScope !== 'undefined' && typeof self !== 'undefined' && s
   window.MJ = { routeBot: (v) => { autoRoute = !!v; }, gradeMax: () => gradeMax(stage), judgeStats: () => ({ perfects, goods, oks, misses, strays, combo, bestCombo }), store, points: () => points, state: () => state, stage: () => stage, report: () => report, song: () => song, score: () => score, simT: () => simT, fishY: () => fishY, tap, diffKey: () => diffKey, endless: () => endless, startEndless, usingWorker: () => !workerBroken && typeof Worker !== 'undefined',
     E, loopSource, profOf, levelOf, DDA, demos: DEMOS, demoBeats: (sr) => demoSong(sr || 22050).beatTimes, setTest: (o) => Object.assign(TEST, o), test: () => TEST,
     lastStart: () => lastStartInfo, regens: () => endless && endless.regens, calibInfo: () => endless && endless.calibInfo, genMs: () => endless && endless.genMs,
-    forceDown: () => { if (endless) { endless.down = STREAK_DOWN - 1; ddaHit(false); } }, gameTime: () => gameTime(), pressAt: (t, type) => pressQ.push({ t, type: type || 'press' }), release, run: () => run };
+    forceDown: () => { if (endless) { endless.countFrom = -1e9; endless.down = DOWN_N - 1; ddaHit(false); } }, gameTime: () => gameTime(), pressAt: (t, type) => pressQ.push({ t, type: type || 'press' }), release, run: () => run };
 
 })();
 
