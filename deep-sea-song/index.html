@@ -1597,6 +1597,18 @@ if (typeof WorkerGlobalScope !== 'undefined' && typeof self !== 'undefined' && s
     return { rate, prevRate: prevRate || rate, holdKeep, pillarSec, minGap, bursts, burstSnare, density, level: levelOf(L) };
   }
   const levelOf = (L) => 1 + Math.round(L * 9);
+  // 2.6 DB: 최저 레벨과 가장 오래 이어서 머문 레벨 기록 (최고 레벨 maxL과 같은 기준인 en.L로 셈)
+  function trackLevel(en, end) {
+    if (!en) return;
+    const lv = levelOf(en.L), t = Math.max(0, simT);
+    if (en.minLv === undefined) { en.minLv = lv; en.lvCur = lv; en.lvSince = t; en.holdLv = lv; en.holdS = 0; }
+    en.minLv = Math.min(en.minLv, lv);
+    if (lv !== en.lvCur || end) {
+      const d = t - en.lvSince;
+      if (d > en.holdS) { en.holdS = d; en.holdLv = en.lvCur; }
+      if (lv !== en.lvCur) { en.lvCur = lv; en.lvSince = t; }
+    }
+  }
   // 1.6: 무한 모드 난이도는 연속 판정으로 바뀐다. Good 이상 STREAK_UP번 연속 → 물살 레벨 +1, Bad 이하(Bad·Miss, 헛누름도 Miss) STREAK_DOWN번 연속 → −1
   //  바뀐 레벨은 다음에 만드는 묶음(32박)부터 적용된다
   // 2.6: 연속이 아니라 누적. 판정 WIN_N번을 한 묶음으로 세고, 그 안에서 Good 이상 UP_N번이면 바로 +1, Bad·Miss DOWN_N번이면 바로 −1.
@@ -1631,7 +1643,7 @@ if (typeof WorkerGlobalScope !== 'undefined' && typeof self !== 'undefined' && s
     } else if (en.n >= WIN_N) en.up = en.down = en.n = 0;
     if (levelOf(en.L) >= 10) en.L = 1; else if (levelOf(en.L) <= 1) en.L = 0;   // 끝 레벨에서는 끝값으로 맞춘다 (보이지 않는 한 칸이 남지 않게)
     if (en.L < fl) en.L = fl;
-    en.maxL = Math.max(en.maxL, en.L);
+    en.maxL = Math.max(en.maxL, en.L); trackLevel(en);
     const soon = dropped && en.regen;
     if (txt) { en.flash = performance.now(); popups.push({ x: JX + 26, y: fishY - 70, t: 0, text: txt + (soon ? ' · 곧 쉬워져요' : ' · 다음 물살부터'), small: true, col: txt.includes('↑') ? '#b4ffd2' : '#ffc4dc' }); }
     if (soon) regenNow('down');
@@ -1654,7 +1666,7 @@ if (typeof WorkerGlobalScope !== 'undefined' && typeof self !== 'undefined' && s
     const L = Math.max(floorL(), clamp(Math.round(clamp((rT - 0.75) / 0.5, 0, 1) * 9) / 9, en.L - CALIB_MAX * LSTEP, en.L + CALIB_MAX * LSTEP));
     en.calibInfo = { m, sigma0, rT, from: levelOf(en.L), to: levelOf(L) };
     const changed = levelOf(L) !== levelOf(en.L);
-    en.L = L; if (changed) { en.up = en.down = en.n = 0; en.countFrom = Infinity; } en.calibRate = true; en.maxL = Math.max(en.maxL, en.L);
+    en.L = L; if (changed) { en.up = en.down = en.n = 0; en.countFrom = Infinity; } en.calibRate = true; en.maxL = Math.max(en.maxL, en.L); trackLevel(en);
     if (changed) {
       en.flash = performance.now();
       popups.push({ x: JX + 26, y: fishY - 70, t: 0, text: `실력에 맞춰 물살 레벨 ${levelOf(L)}`, small: true, col: '#b4ffd2' });
@@ -1705,7 +1717,7 @@ if (typeof WorkerGlobalScope !== 'undefined' && typeof self !== 'undefined' && s
       setStep('validate', 0.5, '이음매 확인 중');
       await new Promise((r) => setTimeout(r, 0));
       stage = E.newEndless(src.an, diffKey, prof); report = { ok: true };
-      endless = { src, L, maxL: L, chunkL: L, n: 0, countFrom: 0, rate: prof.rate, maxRate: prof.rate, up: 0, down: 0, flash: undefined, busy: false, msg: '', msgSub: '', msgAt: undefined,
+      endless = { src, L, maxL: L, minLv: levelOf(L), lvCur: levelOf(L), lvSince: 0, holdLv: levelOf(L), holdS: 0, chunkL: L, n: 0, countFrom: 0, rate: prof.rate, maxRate: prof.rate, up: 0, down: 0, flash: undefined, busy: false, msg: '', msgSub: '', msgAt: undefined,
         calib: false, regen: TEST.regen, errs: [], calibrated: false, calibRate: false, calibInfo: null, regens: [], genMs: [] };
       startPlay();
     } catch (e) { console.warn(e); if (loadId === myLoad) { if (normalSaved) ({ stage, report } = normalSaved); failLoad('endless'); } }
@@ -2395,7 +2407,8 @@ if (typeof WorkerGlobalScope !== 'undefined' && typeof self !== 'undefined' && s
       $('rScore').textContent = points; $('rProg').textContent = String(score);
       $('rAcc').textContent = judged ? Math.round((100 * (perfects + goods)) / judged) + '%' : '-';
       $('rBest').textContent = `${en.src.lapOf(simT)}바퀴째 · 최고 물살 레벨 ${levelOf(en.maxL)} · 최고 빠르기 ×${en.maxRate.toFixed(2)} · Perfect ${perfects} · Good ${goods} · Bad ${oks} · Miss ${misses} · 최고 콤보 ${bestCombo} · 이 곡 무한 모드(${E.DIFF[diffKey].name}) 최고 ${best}점`;
-      sendPlayRecord({ pillars_total: null, progress_pct: null, song_duration_s: null, endless_laps: en.src.lapOf(simT), endless_max_level: levelOf(en.maxL), endless_max_rate: Math.round(en.maxRate * 100) / 100 });
+      trackLevel(en, true);
+      sendPlayRecord({ endless_min_level: en.minLv, endless_longest_level: en.holdLv, endless_longest_level_s: Math.round(en.holdS * 10) / 10, pillars_total: null, progress_pct: null, song_duration_s: null, endless_laps: en.src.lapOf(simT), endless_max_level: levelOf(en.maxL), endless_max_rate: Math.round(en.maxRate * 100) / 100 });
       $('retryBtn').focus({ preventScroll: true });
       return;
     }
